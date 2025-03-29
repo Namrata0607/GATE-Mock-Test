@@ -1,4 +1,4 @@
-import React, { useEffect,useState } from "react";
+// import React, { useEffect,useState } from "react";
 import "../App.css";
 import AnimatedHeading from "../components/AnimatedHeading";
 import IndexCard from "../components/Indexcard";
@@ -17,21 +17,21 @@ function Home() {
   };
 
   //axios
-  const [questions, setQuestions] = useState([]);
-  useEffect(() => {
-    fetch("http://localhost:3000/api/questions/", {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json", // Corrected key syntax
-      },
-    })
-      .then((response) => response.json()) // Ensure response is parsed
-      .then((data) => {
-        setQuestions(data.questions)
-        console.log(data);
-      }) // Handle data
-      .catch((error) => console.error("Error fetching data:", error)); // Handle errors
-  }, []);
+  // const [questions, setQuestions] = useState([]);
+  // useEffect(() => {
+  //   fetch("http://localhost:3000/api/questions/", {
+  //     method: "GET",
+  //     headers: {
+  //       "Content-Type": "application/json", // Corrected key syntax
+  //     },
+  //   })
+  //     .then((response) => response.json()) // Ensure response is parsed
+  //     .then((data) => {
+  //       setQuestions(data.questions)
+  //       console.log(data);
+  //     }) // Handle data
+  //     .catch((error) => console.error("Error fetching data:", error)); // Handle errors
+  // }, []);
 
   const cardData = [
     { imgSrc: "/Images/emoji1.png", title: "Improve Time Management", description: "Practice tests help enhance speed and accuracy for real" },
@@ -81,18 +81,11 @@ function Home() {
         </div>
       </div>
     </div>
-        <div className="flex p-32 gap-20 ">
-          {questions.map((question)=>{
-            return <div className="flex flex-col bg-gray-100 hover:bg-gray-200 rounded-xl p-10 transition-all ease-in">
-                <p className="text-xl font-bold uppercase">{question.question}</p>
-                <p className="text-sm">{question.options}</p>
-                {/* <p>{question.correctAnswer}</p> */}
-            </div>
-          })}
-        </div>
+        {/* question displaying code */}
       </div>
     </>
   );
 }
 
 export default Home;
+

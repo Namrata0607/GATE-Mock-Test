@@ -7,7 +7,7 @@ const IndexCard = ({imgSrc, title, description }) => {
           <img
             src={imgSrc}
             alt={title}
-            className="w-25 h-25 rounded-full object-cover  -mt-10"
+            className="w-25 h-25 object-cover  -mt-10"
           />
           
           {/* Title */}

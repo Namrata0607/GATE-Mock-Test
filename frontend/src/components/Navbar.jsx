@@ -11,7 +11,7 @@ function Navbar(){
   // gradient-to-r from-blue-200 via-purple-300 to-blue-200
   return(
     <nav className="bg-gray-100 border-b-2 border-gray-200 shadow-2xs-gray  h-17 w-full flex justify-between items-center text-gray-800 p-5 ">
-    <h1 className="font-bold text-2xl">GATE Mock Test</h1>
+    <h1 className="font-bold text-2xl">GATEPrep</h1>
     <div className="flex space-x-5 justify-between">
       <Link to="/" className={`${linkClass} ${location.pathname === "/" ? activeClass : inactiveClass}`}>Home</Link>
       <Link to="/examguide" className={`${linkClass} ${location.pathname === "/examguide" ? activeClass : inactiveClass}`}>Exam Guide</Link>

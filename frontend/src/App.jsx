@@ -7,7 +7,7 @@ import ExamGuide from "./pages/ExamGuide";
 import ULoginSignup from "./pages/ULoginSignup";
 import Instructions from "./pages/Instructions";
 import PreQuestionP from "./pages/PreQuestionP";
-import TestUI from "./pages/TestUI";
+import TestUI from "./pages/TestInterface";
 
 function App() {
   return (
