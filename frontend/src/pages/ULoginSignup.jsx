@@ -11,6 +11,7 @@ function ULoginSignup() {
       confirmPassword: "",
       branch: "",
       mobile: "",
+      attemptedTests: "",
     });
 
     const navigate = useNavigate();
@@ -39,6 +40,7 @@ function ULoginSignup() {
         confirmPassword: formData.confirmPassword,
         branch: formData.branch,
         mobile: formData.mobile,
+        attemptedTests: formData.attemptedTests,
       }
       : {
         email: formData.email,
@@ -77,7 +79,7 @@ function ULoginSignup() {
   
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="bg-blue-100 shadow-2xl p-8 rounded-lg w-96 mt-0">
+        <div className=" shadow-2xl p-8 rounded-lg w-96 mt-0">
           <h2 className="text-2xl font-semibold text-center text-gray-900 mb-6">
             {isSignup ? "Signup" : "Login"} to GATE Mock Test
           </h2>
@@ -95,7 +97,7 @@ function ULoginSignup() {
             {isSignup && (
               <input type="password" name="confirmPassword" placeholder="Confirm Password" value={formData.confirmPassword} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded" required />
             )}
-            <button type="submit" className="w-full bg-blue-200  text-gray-800 p-2 rounded hover:bg-gray-200 transition border-2 border-blue-300">{isSignup ? "Sign Up" : "Log In"}</button>
+            <button type="submit" className="w-full bg-blue-200  text-gray-800 p-2 rounded hover:bg-gray-100 transition border-2 border-blue-300">{isSignup ? "Sign Up" : "Log In"}</button>
           </form>
   
           <p className="text-center text-gray-600 mt-4">

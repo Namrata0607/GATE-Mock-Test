@@ -17,7 +17,7 @@ const port = 3000;
 // Enable CORS for your frontend
 app.use(
   cors({
-    origin: "http://localhost:5173", // Change to your frontend URL
+    origin: "http://localhost:5174", // Change to your frontend URL
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
     credentials: true, // Important for cookies
     allowedHeaders: ["Content-Type", "Authorization"],

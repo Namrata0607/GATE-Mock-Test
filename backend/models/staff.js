@@ -15,7 +15,7 @@ const staffSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-})
+},{ timestamps: true });
 
 staffSchema.pre('save', async function (next) {
     if (!this.isModified("password")) {

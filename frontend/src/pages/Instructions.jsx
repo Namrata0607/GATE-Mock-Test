@@ -49,7 +49,7 @@ function Instructions() {
         if (response.ok) {
             alert(data.message);
             localStorage.removeItem("token"); // Clear token from storage
-            window.location.href = "/login"; // Redirect to login page
+            window.location.href = "/"; // Redirect to login page
         } else {
             alert("Logout failed: " + data.message);
         }

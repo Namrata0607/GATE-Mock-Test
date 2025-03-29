@@ -21,8 +21,16 @@ const register = async (req, res, next) => {
                 message: "User already exists" 
             });
         };
-
-        user = new User({ name, email, password ,confirmPassword, branch, mobile });
+        
+        user = new User({ 
+            name, 
+            email, 
+            password,
+            confirmPassword, 
+            branch, 
+            mobile,
+            attemptedTests: null
+        });
         await user.save();
 
         res.status(201).json({

@@ -61,5 +61,5 @@ const staffLogin = async (req, res, next) => {
         next(error);
     }
 }
-
+// paper upload
 module.exports = { staffSignup, staffLogin }

@@ -20,8 +20,15 @@ const userSchema = new mongoose.Schema({
                     attemptedStatus: Boolean
                 }
             ]
+        },
+        {
+            // 
         }
-    ]
+    ],
+    role : {
+        required: true,
+        enum["User","Staff"]
+    }
 });
 
 module.exports = mongoose.model("User", userSchema);
@@ -50,11 +57,18 @@ module.exports = mongoose.model("Branch", branchSchema);
 
 ## 4. **Subject Schema**
 ```js
-const subjectSchema = new mongoose.Schema({
+const subjectSchema = new mongoose.Schema(
+    {
     name: { type: String, required: true },
-    abbreviation: { type: String },
+    // abbreviation: { type: String },
     questions: [{ type: mongoose.Schema.Types.ObjectId, ref: "Question" }]
-});
+    },
+    {
+    name: { type: String, required: true },
+    // abbreviation: { type: String },
+    questions: [{ type: mongoose.Schema.Types.ObjectId, ref: "Question" }]
+    }
+);
 
 module.exports = mongoose.model("Subject", subjectSchema);
 ```
@@ -96,7 +110,6 @@ const testSchema = new mongoose.Schema({
 
 module.exports = mongoose.model("Test", testSchema);
 ```
-
 ## 7. **Test Report Schema**
 ```js
 const testReportSchema = new mongoose.Schema({
