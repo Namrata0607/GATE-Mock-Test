@@ -10,7 +10,8 @@ router.get('/', questionsController.getQuestions);
 // router.get('/project/:id', authMiddleware(), projectController.getProjectById);
 
 // Route to add a new project
-router.post('/question', questionsController.addQuestion);
+// router.post('/question', questionsController.addQuestion);
+router.post('/question', questionsController.uploadQuestions);
 
 // Route to update a project by ID
 // router.put('/project/:id', authMiddleware(), projectController.updateProject);

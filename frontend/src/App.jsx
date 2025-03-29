@@ -8,12 +8,14 @@ import ULoginSignup from "./pages/ULoginSignup";
 import Instructions from "./pages/Instructions";
 import PreQuestionP from "./pages/PreQuestionP";
 import TestUI from "./pages/TestInterface";
+import Admin from "./pages/admin";
 
 function App() {
   return (
     <Router>
       <Navbar />
       <Routes>
+        <Route path="/admin" element={<Admin />} />
         <Route path="/" element={<Home />} />
         <Route path="/examguide" element={<ExamGuide />} />
         <Route path="/uloginsignup" element={<ULoginSignup />} />
