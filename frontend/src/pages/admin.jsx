@@ -152,7 +152,7 @@ export default function Admin() {
         subject: q.subject || "OS"
       }));
 
-      const response = await axios.post("http://localhost:3000/api/questions/question", formattedQuestions);
+      await axios.post("http://localhost:3000/api/questions/question", formattedQuestions);
       alert("Questions inserted successfully!");
     } catch (error) {
       alert("Failed to insert questions.");

@@ -16,10 +16,10 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    confirmPassword : {
-        type: String,
-        required: true
-    },
+    // confirmPassword : {
+    //     type: String,
+    //     required: true
+    // },
     branch: {
         type: String,
         enum: ["Computer Science and Information Technology", "Data Science and Artificial Intelligence",

@@ -9,7 +9,6 @@ const authMiddleware = (req, res, next) => {
             message: "Access denied"
         });
     }
-
     try{
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         req.user = decoded.user;
