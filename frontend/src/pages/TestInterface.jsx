@@ -103,7 +103,7 @@ function TestUI() {
             </button>
           </div>
           {/* Render the TcsCalculator component */}
-          <TcsCalculator />
+          <ScientificCalculator />
         </div>
       </div>
     )}
