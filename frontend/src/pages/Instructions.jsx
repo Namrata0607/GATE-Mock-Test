@@ -1,12 +1,20 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import '../App.css'
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 // import { useEffect, useState } from "react";
+import { fetchData } from '../utils/UserDetails';
+
 
 function Instructions() {
   const [isChecked, setIsChecked] = useState(false);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
+  // const [userName, setUserName] = useState('');
+  // const [user, setUser] = useState({ name: ''});
+  const [user, setUser] = useState({ name: '', branch: '' });
+  const [error, setError] = useState(null);
+  
+  const navigate = useNavigate();
+  
 
   const buttons = [
     { text: "1", color: "bg-gray-200 border-gray-400 text-black rounded-md", info: "You have NOT visited the question yet." },
@@ -16,24 +24,24 @@ function Instructions() {
     { text: "5", color: "bg-purple-500 border-purple-700 text-white rounded-full relative", info: "You have answered the question and marked it for review.This will also be evaluated." },
   ];
 
-  // const [userName, setUserName] = useState("");
-
-  // useEffect(() => {
-
-  //   fetch("http://localhost:3000/api/users")
-  //   .then(response => {
-  //     console.log("Raw Response:", response);
-  //     return response.json(); // Convert to JSON
-  //   })
-  //   .then(data => {
-  //     console.log("User Data:", data); // Debugging
-  //     setUserName(data.name);
-  //   })
-  //   .catch(error => console.error("Error fetching user data:", error));
+   useEffect(() => {
+      // Fetch user data from API
+      const fetchUserData = async () => {
+        try {
+          const data = await fetchData('http://localhost:3000/api/users/userdetails');
+          setUser(data);
+        } catch (err) {
+          setError(err.message);
+        }
+      };
   
-  // }, []);
-  
-  const navigate = useNavigate();
+      fetchUserData();
+    }, []);
+    
+
+    if (error) return <p>Error: {error}</p>;
+    if (!user) return <p>Loading...</p>;
+
   const onClickHandler = () => {
     navigate("/testui");
   };
@@ -69,7 +77,7 @@ function Instructions() {
       </div>
       <div className='container text-center border-2 border-gray-300 w-250 mx-auto h-100'>
         <h1>Test Attempted details</h1>
-        <p className="text-lg font-semibold">Welcome!</p>
+        <p className="text-lg font-semibold">Welcome! {user.name}</p>
         {/* <p>{localStorage.getItem('username')}</p> */}
       </div>
       <div className='container text-center border-2 border-gray-300 p-4 m-4 w-250 mx-auto h-150 relative'>

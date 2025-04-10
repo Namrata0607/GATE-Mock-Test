@@ -62,6 +62,10 @@ function ULoginSignup() {
         const data = JSON.parse(text);
   
         if (response.ok) {
+          // Save the token to localStorage
+          localStorage.setItem("authToken", data.token);
+          // localStorage.setItem("userName", data.user.name); // Store the username
+
           alert("Welcome "+ data.user.name + " !!! You are now logged in.");
           if (isSignup) {
             setIsSignup(false);

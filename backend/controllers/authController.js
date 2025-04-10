@@ -93,4 +93,22 @@ const logout = async (req, res) => {
     }
 };
 
-module.exports = { register , login , logout };
+const getUserDetails = async (req, res, next) => {
+    try {
+        const user = await User.findById(req.user.userId); // `req.user` is set by the auth middleware
+        if (!user) {
+            return res.status(404).json({ 
+                message: "User not found" 
+            });
+        }
+        res.json({ 
+            name: user.name,
+            // email: user.email,
+            branch: user.branch,
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+module.exports = { register , login , logout , getUserDetails };
