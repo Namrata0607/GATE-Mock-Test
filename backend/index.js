@@ -1,12 +1,13 @@
 const express = require('express');
 const app = express(); 
-const questionRoutes = require('./routes/questionsRoutes');
-const userRoutes = require('./routes/authRoutes');
-const staffRoutes = require('./routes/staffRoutes');
-// const adminRoutes = require('./routes/adminRoutes');
 const { connectDB } = require('./config/db');
 const cors = require('cors');
 const dotenv = require('dotenv');
+
+// const questionRoutes = require('./routes/questionsRoutes');
+const userRoutes = require('./routes/authRoutes');
+const staffRoutes = require('./routes/staffRoutes');
+const adminRoutes = require('./routes/adminRoutes');
 const { errorHandler } = require('./middlewares/errorHandler');
 const { authMiddleware } = require('./middlewares/authMiddleware');
 
@@ -33,7 +34,7 @@ app.use(express.json());
 connectDB();
 
 // Public routes (no authentication required)
-app.use('/api/questions', questionRoutes);
+// app.use('/api/questions', questionRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/staff', staffRoutes);
 

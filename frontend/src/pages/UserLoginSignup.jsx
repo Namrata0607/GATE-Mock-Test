@@ -82,34 +82,54 @@ function ULoginSignup() {
     };
   
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className=" shadow-2xl p-8 rounded-lg w-96 mt-0">
-          <h2 className="text-2xl font-semibold text-center text-gray-900 mb-6">
-            {isSignup ? "Signup" : "Login"} to GATE Mock Test
-          </h2>
-  
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {isSignup && (
-              <>
-                <input type="text" name="name" placeholder="Full Name" value={formData.name} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded" required />
-                <input type="text" name="branch" placeholder="Branch" value={formData.branch} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded" required />
-                <input type="tel" name="mobile" placeholder="Mobile Number" value={formData.mobile} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded" required />
-              </>
-            )}
-            <input type="email" name="email" placeholder="Email Address" value={formData.email} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded" required />
-            <input type="password" name="password" placeholder="Password" value={formData.password} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded" required />
-            {isSignup && (
-              <input type="password" name="confirmPassword" placeholder="Confirm Password" value={formData.confirmPassword} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded" required />
-            )}
-            <button type="submit" className="w-full bg-blue-200  text-gray-800 p-2 rounded hover:bg-gray-100 transition border-2 border-blue-300">{isSignup ? "Sign Up" : "Log In"}</button>
-          </form>
-  
-          <p className="text-center text-gray-600 mt-4">
-            {isSignup ? "Already have an account?" : "Don't have an account?"}{" "}
-            <button onClick={() => setIsSignup(!isSignup)} className="text-gray-800 hover:underline">{isSignup ? "Login" : "Signup"}</button>
-          </p>
+      <>
+        <div className="flex items-center justify-left min-h-screen ml-50 w-1/2 top-0">
+          <div className="border-2 border-gray-200 shadow-2xl px-17 py-10 rounded-sm w-100 mt-0">
+            <h2 className="text-2xl font-semibold text-center text-gray-900 mb-6">
+              {isSignup ? "Signup" : "Login"} For Mock Tests
+            </h2>
+    
+            <form onSubmit={handleSubmit} className="space-y-4">
+              {isSignup && (
+                <>
+                  <input type="text" name="name" placeholder="Enter Full Name" value={formData.name} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded hover:border-gray-500" required />
+                  <select
+                    name="branch"
+                    value={formData.branch}
+                    onChange={handleChange}
+                    className="w-full p-2 border border-gray-300 rounded hover:border-gray-500"
+                    required
+                  >
+                    <option value="" disabled className='text-gray-500'>Select Branch</option>
+                    <option value="CSE">Computer Science (CSE)</option>
+                    <option value="IT">Information Technology (IT)</option>
+                    <option value="ECE">Electronics and Communication (ECE)</option>
+                    <option value="EEE">Electrical and Electronics (EEE)</option>
+                    <option value="ME">Mechanical Engineering (ME)</option>
+                    <option value="CE">Civil Engineering (CE)</option>
+                    {/* Add more branches as needed */}
+                  </select>
+                  <input type="tel" name="mobile" placeholder="Enter Mobile Number" value={formData.mobile} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded hover:border-gray-500" required />
+                </>
+              )}
+              <input type="email" name="email" placeholder="Enter Email Address" value={formData.email} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded hover:border-gray-500" required />
+              <input type="password" name="password" placeholder="Enter Password" value={formData.password} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded hover:border-gray-500" required />
+              {isSignup && (
+                <input type="password" name="confirmPassword" placeholder="Confirm Password" value={formData.confirmPassword} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded hover:border-gray-500" required />
+              )}
+              <button type="submit" className="w-full bg-blue-200  text-gray-800 p-2 rounded hover:bg-blue-100 transition border-2 border-blue-300">{isSignup ? "Sign Up" : "Log In"}</button>
+            </form>
+    
+            <p className="text-center text-gray-600 mt-4">
+              {isSignup ? "Already have an account?" : "Don't have an account?"}{" "}
+              <button onClick={() => setIsSignup(!isSignup)} className="text-gray-800 hover:underline">{isSignup ? "Login" : "Signup"}</button>
+            </p>
+          </div>
         </div>
-      </div>
+        <div>
+          <img src="/Images/login.png" alt="GATE_2025" className="absolute top-25 right-0 w-1/2 h-auto object-cover" />
+        </div>
+      </>
     );
 }
 

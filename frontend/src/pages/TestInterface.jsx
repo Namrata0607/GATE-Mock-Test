@@ -8,10 +8,9 @@ import ScientificCalculator from '../components/ScientificCalci';
 function TestUI() {
 
   const [showCalculator, setShowCalculator] = useState(false);
-
   const handleCalculatorClick = () => {
-    setShowCalculator(!showCalculator); // Toggle the visibility of the calculator
-  };
+    setShowCalculator(!showCalculator);
+  }
 
   const [currentSection, setCurrentSection] = useState("Aptitude");
   const totalQuestions = currentSection === "Aptitude" ? 15 : 50;
@@ -74,7 +73,7 @@ function TestUI() {
       <nav className="bg-gray-100 border-b-2 border-gray-200 shadow-sm h-17 w-full flex justify-between items-center text-gray-800 p-5">
         <h1 className="font-bold text-2xl">GATEPrep</h1>
         <div className="flex space-x-5 items-center border border-gray-300 rounded-lg p-2">
-          <h2 className="font-medium">Name: {user.name }</h2>
+          <h2 className="font-medium">Name: {user.name}</h2>
           <h2 className="font-medium">Branch: {user.branch}</h2>
         </div>
       </nav>
@@ -85,28 +84,15 @@ function TestUI() {
         className="border-2 border-gray-400 rounded p-2 bg-blue-400"
         onClick={handleCalculatorClick}
       >
+        {/* Scientific Calculator */}
         {showCalculator ? "Hide Calculator" : "Show Calculator"}
       </button>
-    </div>
 
-    {/* Conditionally render the calculator */}
-    {showCalculator && (
-      <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center z-50 backdrop-brightness-50">
-        <div className="bg-white w-1/2 max-w-[500px] h-auto p-6 rounded-lg shadow-lg overflow-x-hidden">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-bold">Scientific Calculator</h2>
-            <button
-              className="text-gray-500 hover:text-gray-800"
-              onClick={handleCalculatorClick}
-            >
-              ✖
-            </button>
-          </div>
-          {/* Render the TcsCalculator component */}
-          <ScientificCalculator />
-        </div>
-      </div>
-    )}
+      
+      {/* Conditionally render ScientificCalculator component */}
+      {showCalculator && <ScientificCalculator />}
+      
+    </div>
 
     {/* main Container */}
     {/* sm:w-full lg:w-full xl:w-full */}

@@ -1,10 +1,10 @@
 const mongoose = require('mongoose');
 
 const testSchema = new mongoose.Schema({
-    name: { 
+    testName: { 
         type: String, 
         required: true 
-    },
+    },//like test1, test2, test3
     branch: { 
         type: mongoose.Schema.Types.ObjectId, 
         ref: "Branch" 

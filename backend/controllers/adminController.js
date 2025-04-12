@@ -65,69 +65,69 @@ const adminLogin = async (req, res, next) => {
     }
 };
 
-const addQuestion = async (req, res, next) => {
-    try{
-        const { email, branch, question, options, correctAnswer, quetype, marks, negativeMark } = req.body;
+// const addQuestion = async (req, res, next) => {
+//     try{
+//         const { email, branch, question, options, correctAnswer, quetype, marks, negativeMark } = req.body;
 
-        if (!email || !branch || !question || !options || options.length !== 4 || 
-            !correctAnswer || !quetype || marks === undefined, negativeMark === undefined) {
-            return res.status(400).json({ 
-                message: "All fields are required" 
-            });
-        }
-        const admin = await Admin.findOne({ email });
-        if (!admin) {
-            return res.status(401).json({ 
-                message: "Invalid credentials" 
-            });
-        }
-        if(admin.branch !== branch){
-            return res.status(401).json({ 
-                message: "You are not authorized to add questions for this branch" 
-            });
-        }
+//         if (!email || !branch || !question || !options || options.length !== 4 || 
+//             !correctAnswer || !quetype || marks === undefined, negativeMark === undefined) {
+//             return res.status(400).json({ 
+//                 message: "All fields are required" 
+//             });
+//         }
+//         const admin = await Admin.findOne({ email });
+//         if (!admin) {
+//             return res.status(401).json({ 
+//                 message: "Invalid credentials" 
+//             });
+//         }
+//         if(admin.branch !== branch){
+//             return res.status(401).json({ 
+//                 message: "You are not authorized to add questions for this branch" 
+//             });
+//         }
 
-        const newQuestion = {
-            branch,
-            question,
-            options,
-            correctAnswer,
-            quetype,
-            marks,
-            negativeMark,
-        };
+//         const newQuestion = {
+//             branch,
+//             question,
+//             options,
+//             correctAnswer,
+//             quetype,
+//             marks,
+//             negativeMark,
+//         };
 
-        admin.questions.push( newQuestion );
-        await admin.save();
-        res.status(201).json({
-            message: "Question added successfully"
-        });
-    }catch(error){
-        next(error);
-    }
-};
+//         admin.questions.push( newQuestion );
+//         await admin.save();
+//         res.status(201).json({
+//             message: "Question added successfully"
+//         });
+//     }catch(error){
+//         next(error);
+//     }
+// };
 
-const getQuestions = async (req, res, next) => {
-    try{
-        console.log("Request Body:", req.body);
-        const { branch } = req.body;
-        if (!branch) {
-            return res.status(400).json({ 
-                message: "Branch is required" 
-            });
-        }
-        const data = await Admin.find({ branch });
+// const getQuestions = async (req, res, next) => {
+//     try{
+//         console.log("Request Body:", req.body);
+//         const { branch } = req.body;
+//         if (!branch) {
+//             return res.status(400).json({ 
+//                 message: "Branch is required" 
+//             });
+//         }
+//         const data = await Admin.find({ branch });
         
-        console.log("Database Response:", data); // Debugging log
+//         console.log("Database Response:", data); // Debugging log
 
-        if (!data) {
-            return res.status(404).json({ message: "No questions found for this branch" });
-        }
-        console.log(data.questions)
-        res.status(200).json(data[0].questions);
-    }catch(error){
-        next(error);
-    }
-};
+//         if (!data) {
+//             return res.status(404).json({ message: "No questions found for this branch" });
+//         }
+//         console.log(data.questions)
+//         res.status(200).json(data[0].questions);
+//     }catch(error){
+//         next(error);
+//     }
+// };
 
-module.exports = { adminSignup, adminLogin, addQuestion, getQuestions };
+module.exports = { adminSignup, adminLogin };

@@ -16,14 +16,10 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    // confirmPassword : {
-    //     type: String,
-    //     required: true
-    // },
     branch: {
-        type: String,
-        enum: ["Computer Science and Information Technology", "Data Science and Artificial Intelligence",
-            "Civil Engineering", "Electronics and Communication Engineering", "Mechanical Engineering"],
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Branch",
+        required: true
     },
     mobile : {
         type: Number,
@@ -48,10 +44,11 @@ const userSchema = new mongoose.Schema({
             ]
         }
     ],
-    // role : {
-    //     required: true,
-    //     enum : ["User","Staff"]
-    // }
+    role : {
+        type: String,
+        enum : ["User","Staff","Admin"],
+        default: "User"
+    }
 }, {timestamps: true});
 // timestamps: true will automatically add createdAt and updatedAt fields in the database
 
