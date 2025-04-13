@@ -3,14 +3,14 @@ const mongoose = require('mongoose');
 const subjectSchema = new mongoose.Schema({
     subjectName: {
         type: String,
-        required: true
-        // unique: true
+        required: true,
+        unique: true
     },
-    branch: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Branch',
-        required: true
-    },
+    // branch: {
+    //     type: mongoose.Schema.Types.ObjectId,
+    //     ref: 'Branch',
+    //     required: true
+    // },
     questions: [
         { 
             type: mongoose.Schema.Types.ObjectId, 
@@ -21,6 +21,6 @@ const subjectSchema = new mongoose.Schema({
 
 
 // Enforce uniqueness of subjectName per branch
-subjectSchema.index({ subjectName: 1, branch: 1 }, { unique: true });
+// subjectSchema.index({ subjectName: 1, branch: 1 }, { unique: true });
 
 module.exports = mongoose.model('Subjects', subjectSchema);

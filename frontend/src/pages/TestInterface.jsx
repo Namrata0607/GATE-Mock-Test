@@ -81,7 +81,7 @@ function TestUI() {
       <div className="flex space-x-5 mx-auto mt-1 p-3 border-2 border-gray-300 bg-blue-100">
       <p>Timer: {currentTime.toLocaleTimeString()}</p>
       <button
-        className="border-2 border-gray-400 rounded p-2 bg-blue-400"
+        className=" rounded p-2 bg-blue-400"
         onClick={handleCalculatorClick}
       >
         {/* Scientific Calculator */}
@@ -100,7 +100,8 @@ function TestUI() {
       <div className="m-0 container flex mx-auto p-3 rounded-lg w-full h-[600px] text-center">
         
         {/* Left Section */}
-        <div className="w-2/2 h-full border-2 border-gray-300  rounded-lg p-4">
+        {/* border-2 border-gray-300 */}
+        <div className="w-2/2 h-full rounded-lg p-4">
           <SectionTabs
             currentSection={currentSection}
             setCurrentSection={handleTabSwitch}
@@ -128,7 +129,7 @@ function TestUI() {
 
 
         {/* Right Panel - Question Pallet */}
-        <div className="w-1/3 h-full border-2 border-gray-300 rounded-lg p-4 overflow-y-auto">
+        <div className="w-1/3 h-full rounded-lg p-4 overflow-y-auto">
           <div className="mt-4">
             <h2 className="text-xl font-semibold mb-1">
               Chosen Section: {currentSection}

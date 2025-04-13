@@ -11,9 +11,9 @@ function Navbar(){
   // gradient-to-r from-blue-200 via-purple-300 to-blue-200
   return(
     <nav className="bg-gray-100 border-b-2 border-gray-200 shadow-2xs-gray  h-17 w-full flex justify-between items-center text-gray-800 p-5 ">
-    <h1 className="font-[Open_Sans] font-bold text-2xl animate-shimmer hover:scale-105 transition-transform duration-300 bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 bg-clip-text text-transparent">GATEPrep</h1>
+    <h1 className="font-[Open_Sans] font-bold text-3xl animate-shimmer bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 bg-clip-text text-transparent">GATEPrep</h1>
     <div className="flex space-x-5 justify-between">
-      <Link to="/admin" className={`${linkClass} ${location.pathname === "/admin" ? activeClass : inactiveClass}`}>Admin</Link>
+      {/* <Link to="/admin" className={`${linkClass} ${location.pathname === "/admin" ? activeClass : inactiveClass}`}>Admin</Link> */}
       <Link to="/" className={`${linkClass} ${location.pathname === "/" ? activeClass : inactiveClass}`}>Home</Link>
       <Link to="/examguide" className={`${linkClass} ${location.pathname === "/examguide" ? activeClass : inactiveClass}`}>Exam Guide</Link>
       <Link to="/prequestionp" className={`${linkClass} ${location.pathname === "/prequestionp" ? activeClass : inactiveClass}`}>Previous Question Papers</Link>
