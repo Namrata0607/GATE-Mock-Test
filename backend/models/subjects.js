@@ -6,11 +6,13 @@ const subjectSchema = new mongoose.Schema({
         required: true,
         unique: true
     },
-    // branch: {
-    //     type: mongoose.Schema.Types.ObjectId,
-    //     ref: 'Branch',
-    //     required: true
-    // },
+    branch: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Branch',
+            required: true
+        }
+    ],
     questions: [
         { 
             type: mongoose.Schema.Types.ObjectId, 

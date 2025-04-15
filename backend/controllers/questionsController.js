@@ -36,13 +36,20 @@ const uploadQuestions = async (req, res, next) => {
             // 2.Subject
             let subject = await Subject.findOne({ subjectName: subjectName});
             if (!subject) {
-                subject = await Subject.create({ subjectName: subjectName, questions: [] });
+                subject = await Subject.create({ subjectName: subjectName, branches: [branch._id], questions: [] });
+            }else {
+                // Push branch only if not already linked
+                if (!subject.branch.includes(branch._id)) {
+                    subject.branch.push(branch._id);
+                    await subject.save();
+                }
             }
+
             // Associate subject to branch if not already linked
-            if (!branch.subjects.includes(subject._id)) {
-                branch.subjects.push(subject._id);
-                await branch.save();
-            }
+            // if (!branch.subjects.includes(subject._id)) {
+            //     branch.subjects.push(subject._id);
+            //     await branch.save();
+            // }
 
             // 3.Question
             const newQuestion = await Question.create({

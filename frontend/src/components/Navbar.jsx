@@ -10,7 +10,7 @@ function Navbar(){
   const inactiveClass = ""; 
   // gradient-to-r from-blue-200 via-purple-300 to-blue-200
   return(
-    <nav className="bg-gray-100 border-b-2 border-gray-200 shadow-2xs-gray  h-17 w-full flex justify-between items-center text-gray-800 p-5 ">
+<nav className="bg-gray-100 border-b-2 border-gray-200 shadow-md flex flex-col md:flex-row justify-between items-center text-gray-800 p-4 md:p-6">
     <h1 className="font-[Open_Sans] font-bold text-3xl animate-shimmer bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 bg-clip-text text-transparent">GATEPrep</h1>
     <div className="flex space-x-5 justify-between">
       {/* <Link to="/admin" className={`${linkClass} ${location.pathname === "/admin" ? activeClass : inactiveClass}`}>Admin</Link> */}
