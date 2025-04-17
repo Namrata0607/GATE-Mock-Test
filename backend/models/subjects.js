@@ -6,7 +6,7 @@ const subjectSchema = new mongoose.Schema({
         required: true,
         unique: true
     },
-    branch: [
+    branches: [
         {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Branch',

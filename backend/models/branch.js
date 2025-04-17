@@ -6,12 +6,12 @@ const branchSchema = new mongoose.Schema({
         required: true,
         unique: true
     },
-    subjects: [
-        { 
-            type: mongoose.Schema.Types.ObjectId, 
-            ref: "Subjects" 
-        }
-    ]
+    // subjects: [
+    //     { 
+    //         type: mongoose.Schema.Types.ObjectId, 
+    //         ref: "Subjects" 
+    //     }
+    // ]
 
 })
 

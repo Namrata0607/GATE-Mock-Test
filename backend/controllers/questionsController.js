@@ -9,9 +9,35 @@ const uploadQuestions = async (req, res, next) => {
         const sheet = workbook.Sheets[workbook.SheetNames[0]];
         const data = XLSX.utils.sheet_to_json(sheet);
 
+        let selectedBranchNames = req.body.selectedBranches; // Array: ['CSE', 'AIML', ...]
+        // console.log("Received selectedBranches:", selectedBranchNames);
+
+        if (typeof selectedBranchNames === 'string') {
+            selectedBranchNames = selectedBranchNames.split(',').map(name => name.trim());
+        }
+
+        // if (!selectedBranchNames || !selectedBranchNames.length) {
+        //     return res.status(400).json({ message: "No branches selected." });
+        // }
+
+        // Resolve all selected branch documents
+        let existingBranches  = await Branch.find({ branchName: { $in: selectedBranchNames } });
+        // it will return an array of branch documents that match the selected branch names
+        // $in: operator is used to match any of the specified values in the array.
+        const existingBranchNames = existingBranches.map(branch => branch.branchName);
+
+        const branchesToCreate = selectedBranchNames.filter(name => !existingBranchNames.includes(name));
+
+        const newBranches = await Branch.insertMany(
+            branchesToCreate.map(name => ({ branchName: name, subjects: [] }))
+        );
+
+        // Step 4: Combine all branch docs (existing + new)
+        const allBranches = [...existingBranches, ...newBranches];
+
         for(const row of data){
             const {
-                branchName,
+                // branchName,
                 subjectName,
                 question,
                 queImg,
@@ -28,28 +54,33 @@ const uploadQuestions = async (req, res, next) => {
               const options = [option1, option2, option3, option4];
 
             // 1.Branch
-            let branch = await Branch.findOne({ branchName: branchName });
-            if (!branch) {
-                branch = await Branch.create({ branchName: branchName, subjects: [] });
-            }
+            // let branch = await Branch.findOne({ branchName: branchName });
+            // if (!branch) {
+            //     branch = await Branch.create({ branchName: branchName, subjects: [] });
+            // }
 
             // 2.Subject
             let subject = await Subject.findOne({ subjectName: subjectName});
+            
             if (!subject) {
-                subject = await Subject.create({ subjectName: subjectName, branches: [branch._id], questions: [] });
-            }else {
-                // Push branch only if not already linked
-                if (!subject.branch.includes(branch._id)) {
-                    subject.branch.push(branch._id);
-                    await subject.save();
+                subject = await Subject.create({
+                    subjectName: subjectName,
+                    branches: allBranches.map(b => b._id),
+                    // b => b._id is used to extract the _id property from each branch document in the branchDocs array.
+                    questions: []
+                });
+            } else {
+                if (!subject.branches) subject.branches = [];
+                // Add new branches to subject if not already present
+                for (const branch of allBranches) {
+                    if (!subject.branches.includes(branch._id)) {
+                        subject.branches.push(branch._id);
+                    }
                 }
+                await subject.save();
             }
-
-            // Associate subject to branch if not already linked
-            // if (!branch.subjects.includes(subject._id)) {
-            //     branch.subjects.push(subject._id);
-            //     await branch.save();
-            // }
+            // it will check if the subject already exists in the database. If it does not exist, it will create a new subject document with the provided subject name and associate it with the selected branches.
+            // If it does exist, it will check if the branches are already associated with the subject and add them if not.
 
             // 3.Question
             const newQuestion = await Question.create({
@@ -62,9 +93,9 @@ const uploadQuestions = async (req, res, next) => {
                 mark,
                 subject: subject._id,
             });
+
             subject.questions.push(newQuestion._id);
             await subject.save();
-
         }
 
         res.status(200).json({ message: "Questions uploaded successfully!" });
