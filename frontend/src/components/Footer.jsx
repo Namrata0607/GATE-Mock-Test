@@ -1,8 +1,8 @@
-import { FaFacebook, FaTwitter, FaLinkedin, FaGithub, FaInstagram, FaYoutube } from "react-icons/fa";
+import { FaFacebook, FaTwitter, FaInstagram, FaYoutube } from "react-icons/fa";
 
 function Footer() {
-  return (
-    <footer className="bg-gray-100 border-t-2 border-gray-200 shadow-2xs-gray text-gray-800 py-6 mt-5">
+  return(
+    <footer className="absolute w-full bg-gray-100 border-t-2 border-gray-200 shadow-2xs-gray text-gray-800 py-6 mb-0">
       <div className="container mx-auto flex flex-col md:flex-row justify-between items-center px-5">
         
         {/* Left Side - Platform Info */}
@@ -20,7 +20,7 @@ function Footer() {
         </div>
 
         {/* Right Side - Social Media Links */}
-        <div className="flex space-x-5">
+        <div className="flex space-x-5 mt-4">
           <a href="https://facebook.com" target="_blank" rel="noopener noreferrer">
             <FaFacebook className="text-xl hover:text-blue-500" />
           </a>

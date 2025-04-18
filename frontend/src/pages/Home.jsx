@@ -49,43 +49,40 @@ function Home() {
         {/* <marquee behavior="" direction="" className="text-2xl text-red-600">
           Any Notice or Sentence</marquee> */}
 
-        <div className="flex flex-row items-center text-center">
+        <div className="flex flex-col items-center text-center md:flex-row md:justify-between md:items-center md:mt-2 lg:mt-5 lg:mb-4">
           <img
             src="/Images/girllaptop.jpeg"
             alt="Background"
-            className="w-230 h-150"
+            className="w-140 h-90 mt-5 mb-8 md:w-120 md:h-80 md:mt-5 md:mb-10 lg:w-220 lg:h-150 lg:mt-0 lg:mb-10"
           />
           <div className="flex flex-col items-center">
             <AnimatedHeading />
             <button
               onClick={onClickHandler}
-              className="mt-6 mr-20 px-6 py-3 w-100 bg-white border-3 border-blue-200
+              className="w-70 h-14 bg-white border-3 border-blue-200
              text-gray-800 font-semibold text-2xl rounded-lg hover:bg-blue-200
-               not-only: transition ease-in-out "
+               not-only: transition ease-in-out text-center lg:text-3xl lg:w-100 lg:h-17 lg:mt-10 lg:mb-10"
             >
-              {/* hover:scale-[1.1] transition */}
               Proceed To Test
             </button>
           </div>
         </div>
         <div className="flex items-center justify-center">
-      <div className="flex-col items-center justify-center h-200 w-300 mb-20 mt-20 pt-0">
-        <h1 className="relative text-5xl font-[Open_Sans] text-gray-800 font-bold mt-10 mb-10 text-center">
+      <div className="flex-col items-center justify-center h-450 w-300 lg:h-320 mt-10 md:mt-0">
+        <h1 className="relative text-3xl font-[Open_Sans] text-gray-800 font-bold mt-10 mb-10 text-center md:text-4xl lg:text-5xl lg:mb-30">
           Why to give mock tests?
         </h1>
         {/* Render Cards Dynamically */}
-        <div className="flex flex-wrap justify-center gap-20 mt-15">
+        <div className="flex flex-wrap justify-center gap-15 mt-15 lg:gap-30">
           {cardData.map((card, index) => (
             <IndexCard key={index} imgSrc={card.imgSrc} title={card.title} description={card.description} />
           ))}
         </div>
       </div>
     </div>
-        {/* question displaying code */}
       </div>
     </>
   );
 }
 
 export default Home;
-

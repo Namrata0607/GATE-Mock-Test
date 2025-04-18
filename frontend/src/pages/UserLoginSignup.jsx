@@ -82,9 +82,9 @@ function ULoginSignup() {
     };
   
     return (
-      <>
-        <div className="flex items-center justify-left min-h-screen ml-50 w-1/2 top-0">
-          <div className="border-2 border-gray-200 shadow-2xl px-17 py-10 rounded-sm w-100 mt-0">
+      <div className='flex flex-col items-center justify-center lg:flex-row lg:justify-between lg:items-center lg:mt-10 lg:mr-10 lg:-mb-30'>
+        <div className="flex items-center justify-left min-h-screen -mt-15 lg:ml-40 lg:-mt-90">
+          <div className="border-2 border-gray-200 shadow-xl px-17 py-10 rounded-sm w-100 lg:w-120 lg:h-90">
             <h2 className="text-2xl font-semibold text-center text-gray-900 mb-6">
               {isSignup ? "Signup" : "Login"} For Mock Tests
             </h2>
@@ -126,10 +126,10 @@ function ULoginSignup() {
             </p>
           </div>
         </div>
-        <div>
-          <img src="/Images/login.png" alt="GATE_2025" className="absolute top-25 right-0 w-1/2 h-auto object-cover" />
+        <div className='flex items-center justify-center mb-18 -mt-20 md:mt-5 md:mb-40 lg:-mt-15'>
+          <img src="/Images/login_Img.png" alt="GATE_2025" className="h-100 md:h-130 md:w-150 lg:w-180 lg:h-200 object-cover" />
         </div>
-      </>
+      </div>
     );
 }
 
