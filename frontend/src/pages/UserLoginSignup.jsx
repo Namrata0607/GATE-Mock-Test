@@ -1,5 +1,5 @@
 import React from 'react'
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 function ULoginSignup() {
@@ -13,8 +13,28 @@ function ULoginSignup() {
       mobile: "",
       attemptedTests: "",
     });
+    const [branches, setBranches] = useState([]); // State to store branches
 
     const navigate = useNavigate();
+
+    useEffect(() => {
+      // Fetch branches from the backend
+      const fetchBranches = async () => {
+          try {
+              const response = await fetch("http://localhost:3000/api/branches");
+              if (!response.ok) {
+                  throw new Error("Failed to fetch branches");
+              }
+              const data = await response.json();
+              // console.log("Fetched Branches:", data); // Debug log
+              setBranches(data); // Set branches in state
+          } catch (error) {
+              console.error("Error fetching branches:", error.message);
+          }
+      };
+
+      fetchBranches();
+  }, []);
   
     const handleChange = (e) => {
       setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -57,7 +77,7 @@ function ULoginSignup() {
         });
   
         const text = await response.text();  // Read raw response
-        console.log("Raw Response:", text);
+        // console.log("Raw Response:", text);
         
         const data = JSON.parse(text);
   
@@ -66,7 +86,13 @@ function ULoginSignup() {
           localStorage.setItem("authToken", data.token);
           // localStorage.setItem("userName", data.user.name); // Store the username
 
-          alert("Welcome "+ data.user.name + " !!! You are now logged in.");
+            if (isSignup) {
+            alert("Welcome " + data.user.name + " !!! You have successfully signed up.");
+            setIsSignup(false);
+            } else {
+            alert("Welcome " + data.user.name + " !!! You are now logged in.");
+            navigate("/instructions");
+            }
           if (isSignup) {
             setIsSignup(false);
           } else {
@@ -82,17 +108,18 @@ function ULoginSignup() {
     };
   
     return (
-      <div className='flex flex-col items-center justify-center lg:flex-row lg:justify-between lg:items-center lg:mt-10 lg:mr-10 lg:-mb-30'>
-        <div className="flex items-center justify-left min-h-screen -mt-15 lg:ml-40 lg:-mt-90">
-          <div className="border-2 border-gray-200 shadow-xl px-17 py-10 rounded-sm w-100 lg:w-120 lg:h-90">
+      <div className='flex flex-col items-center justify-center lg:flex-row lg:justify-between lg:items-center lg:mt-10 lg:mr-10 lg:mb-10'>
+        <div className="flex items-center justify-center md:justify-left mt-0 mb-20 md:mt-0 min-h-screen lg:ml-10 lg:-mt-20">
+          <div className="border-2 border-gray-200 shadow-xl px-12 py-10 rounded-sm w-full mx-5 md:w-2/3 lg:w-2/3">
             <h2 className="text-2xl font-semibold text-center text-gray-900 mb-6">
               {isSignup ? "Signup" : "Login"} For Mock Tests
             </h2>
     
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-4 lg:px-10">
               {isSignup && (
                 <>
                   <input type="text" name="name" placeholder="Enter Full Name" value={formData.name} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded hover:border-gray-500" required />
+                  {/* console.log("Branches State:", branches); // Debug log */}
                   <select
                     name="branch"
                     value={formData.branch}
@@ -100,14 +127,15 @@ function ULoginSignup() {
                     className="w-full p-2 border border-gray-300 rounded hover:border-gray-500"
                     required
                   >
-                    <option value="" disabled className='text-gray-500'>Select Branch</option>
-                    <option value="CSE">Computer Science (CSE)</option>
-                    <option value="IT">Information Technology (IT)</option>
-                    <option value="ECE">Electronics and Communication (ECE)</option>
-                    <option value="EEE">Electrical and Electronics (EEE)</option>
-                    <option value="ME">Mechanical Engineering (ME)</option>
-                    <option value="CE">Civil Engineering (CE)</option>
-                    {/* Add more branches as needed */}
+                  <option value="" disabled className="text-red-500">
+                    Select Branch
+                  </option>
+                  {branches.map((branch) => (
+                    <option key={branch._id} value={branch._id}>
+                      {branch.branchName}
+                    </option>
+                    
+                  ))}
                   </select>
                   <input type="tel" name="mobile" placeholder="Enter Mobile Number" value={formData.mobile} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded hover:border-gray-500" required />
                 </>
@@ -117,7 +145,7 @@ function ULoginSignup() {
               {isSignup && (
                 <input type="password" name="confirmPassword" placeholder="Confirm Password" value={formData.confirmPassword} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded hover:border-gray-500" required />
               )}
-              <button type="submit" className="w-full bg-blue-200  text-gray-800 p-2 rounded hover:bg-blue-100 transition border-2 border-blue-300">{isSignup ? "Sign Up" : "Log In"}</button>
+              <button type="submit" className="w-full text-lg font-semibold font-[sans] bg-white text-gray-800 p-2 rounded transition ease-in-out duration-400 border-3 border-blue-950  hover:bg-gradient-to-r from-blue-950 via-blue-900 to-blue-950 hover:text-white hover:border-blue-950">{isSignup ? "Sign Up" : "Log In"}</button>
             </form>
     
             <p className="text-center text-gray-600 mt-4">
@@ -126,8 +154,8 @@ function ULoginSignup() {
             </p>
           </div>
         </div>
-        <div className='flex items-center justify-center mb-18 -mt-20 md:mt-5 md:mb-40 lg:-mt-15'>
-          <img src="/Images/login_Img.png" alt="GATE_2025" className="h-100 md:h-130 md:w-150 lg:w-180 lg:h-200 object-cover" />
+        <div className='flex items-center justify-center mb-18 -mt-20 md:-mt-20 md:mb-20'>
+          <img src="/Images/login-img.png" alt="GATE_2025" className="h-100 md:h-150 md:w-150 object-cover" />
         </div>
       </div>
     );

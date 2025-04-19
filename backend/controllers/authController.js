@@ -64,7 +64,8 @@ const login = async (req, res ,next) => {
             });
         }
 
-        const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: "1h" });
+        const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: "2h" });
+        console.log('Generated Token:', token); // Debug log
         res.json({
             token,
             user : {
@@ -95,17 +96,19 @@ const logout = async (req, res) => {
 
 const getUserDetails = async (req, res, next) => {
     try {
-        const user = await User.findById(req.user.userId); // `req.user` is set by the auth middleware
+        const user = await User.findById(req.user.userId).populate('branch','branchName'); // Populate the branch field with branchName
         if (!user) {
             return res.status(404).json({ 
                 message: "User not found" 
             });
         }
+        // console.log('user data:',user);
         res.json({ 
             name: user.name,
-            // email: user.email,
-            branch: user.branch,
+            branch: user.branch.branchName,
         });
+        // console.log(user.branch),
+        // console.log(user.name)
     } catch (error) {
         next(error);
     }

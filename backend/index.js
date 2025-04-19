@@ -8,8 +8,11 @@ const dotenv = require('dotenv');
 const userRoutes = require('./routes/authRoutes');
 const staffRoutes = require('./routes/staffRoutes');
 const adminRoutes = require('./routes/adminRoutes');
+const questionRoutes = require('./routes/questionsRoutes');
 const { errorHandler } = require('./middlewares/errorHandler');
 const { authMiddleware } = require('./middlewares/authMiddleware');
+const branchRoutes = require('./routes/branchRoutes');
+
 
 dotenv.config();
 
@@ -37,7 +40,8 @@ connectDB();
 // app.use('/api/questions', questionRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/staff', staffRoutes);
-
+app.use('/api', branchRoutes);
+app.use('/api/test', questionRoutes);
 // app.use(authMiddleware); // Apply auth middleware for routes below
 
 

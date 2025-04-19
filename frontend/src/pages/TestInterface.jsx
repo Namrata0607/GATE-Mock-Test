@@ -41,22 +41,51 @@ function TestUI() {
   const [currentTime, setCurrentTime] = useState(new Date());
   
 
+  // useEffect(() => {
+  //   // Fetch user data from API
+  //   const fetchUserData = async () => {
+  //     try {
+  //       const data = await fetchData('http://localhost:3000/api/users/userdetails');
+  //       setUser(data);
+  //     } catch (err) {
+  //       setError(err.message);
+  //     }
+  //   };
+
+  //   fetchUserData();
+  // }, []);
+
   useEffect(() => {
-    // Fetch user data from API
     const fetchUserData = async () => {
       try {
-        const data = await fetchData('http://localhost:3000/api/users/userdetails');
-        setUser(data);
+        const token = localStorage.getItem('authToken'); // Retrieve token from localStorage
+        if (!token) {
+          console.error('No token found. User is not logged in.');
+          return;
+        }
+  
+        const data = await fetchData('http://localhost:3000/api/users/userdetails', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`, // Include token in Authorization header
+          },
+        });
+  
+        // if (!response.ok) {
+        //   throw new Error('Failed to fetch user data');
+        // }
+        // const data = await response.json();
+        setUser(data); // Set user details in state
       } catch (err) {
         setError(err.message);
       }
     };
-
+  
     fetchUserData();
   }, []);
 
   useEffect(() => {
-    // Set up a timer to update the current time every second
     const timer = setInterval(() => {
       setCurrentTime(new Date());
     }, 1000);
@@ -70,23 +99,26 @@ function TestUI() {
 
   return (
     <>
-      <nav className="bg-gray-100 border-b-2 border-gray-200 shadow-sm h-17 w-full flex justify-between items-center text-gray-800 p-5">
-        <h1 className="font-bold text-2xl">GATEPrep</h1>
-        <div className="flex space-x-5 items-center border border-gray-300 rounded-lg p-2">
-          <h2 className="font-medium">Name: {user.name}</h2>
-          <h2 className="font-medium">Branch: {user.branch}</h2>
+    {/* nav bar for user info */}
+      <nav className="bg-gray-100 border-b-2 border-gray-200 shadow-2xs-gray h-15 md:h-16 lg:h-16 w-full flex justify-between items-center text-gray-800 p-5">
+      <h1 className="font-[Open_Sans] font-bold text-xl md:text-2xl lg:text-3xl animate-shimmer bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 bg-clip-text text-transparent">
+        GATEPrep
+      </h1>
+        <div className="flex space-x-2 items-center bg-gradient-to-r from-blue-950 via-blue-900 to-blue-950 rounded-sm p-2 h-10 w-60 ml-9 mt-4 mb-4 font-[sans] md:w-80 md:pl-5 lg:w-90 lg:pl-7 text-white text-sm md:text-lg lg:text-xl">
+          <h2 className="font-medium">{user.name}</h2><b>-</b>
+          <h2 className="font-medium">{user.branch}</h2>
         </div>
       </nav>
       
-      <div className="flex space-x-5 mx-auto mt-1 p-3 border-2 border-gray-300 bg-blue-100">
-      <p>Timer: {currentTime.toLocaleTimeString()}</p>
+      <div className="flex space-x-5 mx-auto mt-2 p-3 border-2 border-gray-300 rounded-lg w-100 h-16 justify-between items-center mb-0">
       <button
         className=" rounded p-2 bg-blue-400"
         onClick={handleCalculatorClick}
-      >
+        >
         {/* Scientific Calculator */}
         {showCalculator ? "Hide Calculator" : "Show Calculator"}
       </button>
+        <p>Timer: {currentTime.toLocaleTimeString()}</p>
 
       
       {/* Conditionally render ScientificCalculator component */}
@@ -97,7 +129,7 @@ function TestUI() {
     {/* main Container */}
     {/* sm:w-full lg:w-full xl:w-full */}
     {/* h-full sm:h-72 md:h-80 lg:h-96 xl: */}
-      <div className="m-0 container flex mx-auto p-3 rounded-lg w-full h-[600px] text-center">
+      <div className="m-0 container flex flex-col lg:flex-row mx-auto p-3 rounded-lg w-full h-[600px] text-center">
         
         {/* Left Section */}
         {/* border-2 border-gray-300 */}

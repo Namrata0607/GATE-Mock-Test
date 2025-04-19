@@ -13,7 +13,7 @@ function ProfileNavbar(){
   // const inactiveClass = ""; 
   // gradient-to-r from-blue-200 via-purple-300 to-blue-200
 
-    const [user, setUser] = useState({ name: '', branch: '' });
+    const [user, setUser] = useState({ name: ''});
     const [error, setError] = useState(null);
 
     useEffect(() => {
@@ -54,11 +54,12 @@ function ProfileNavbar(){
 };
   
 return(
-    <nav className="bg-gray-100 border-b-2 border-gray-200 shadow-2xs-gray  h-17 md:h-20 lg:h-20 w-full flex justify-between items-center text-gray-800 p-5 ">
-    <h1 className="font-[Open_Sans] font-bold text-lg md:text-xl lg:text-3xl ">Welcome {user.name} !</h1>
+    <nav className="bg-gray-100 border-b-2 border-gray-200 shadow-2xs-gray h-15 md:h-16 lg:h-16 w-full flex justify-between items-center text-gray-800 p-5 ">
+    <h1 className="font-[Open_Sans] font-bold text-lg md:text-xl lg:text-2xl ">Welcome {user.name} !</h1>
     <div className="flex space-x-5 justify-between">
         <button onClick={handleLogout} 
-        className='relative border-2 h-10 w-30 rounded-sm bg-blue-200 border-blue-200 hover:bg-blue-100 font-[Open_Sans] font-bold md:text-lg md:w-35 lg:text-xl lg:h-12 lg:w-40'>
+        className='relative border-2 border-blue-950 h-8 w-28 rounded-sm bg-white bg-border-blue-950 hover:bg-gradient-to-r from-blue-950 via-blue-900 to-blue-950 hover:text-white 
+        font-[Sans] font-semibold md:text-lg md:w-30 md:h-9 lg:h-10 lg:w-32 ease-in-out duration-400'>
           Log Out
         </button>
     </div>

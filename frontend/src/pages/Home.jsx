@@ -34,12 +34,12 @@ function Home() {
   // }, []);
 
   const cardData = [
-    { imgSrc: "/Images/emoji1.png", title: "Improve Time Management", description: "Practice tests help enhance speed and accuracy for real" },
-    { imgSrc: "/Images/emoji2.png", title: "Analyze Weaknesses", description: "Practice teste helps to identify areas of improvement." },
-    { imgSrc: "/Images/emoji3.png", title: "Real Exam Experience", description: "Practice tests help you get familiar with the exam pattern." },
-    { imgSrc: "/Images/emoji4.png", title: "Reduce Exam Anxiety", description: "Practice tests help reduce anxiety and stress before exams." },
-    { imgSrc: "/Images/emoji5.png", title: "Track Progress", description: "Practice teste helps to track your progress and performance." },
-    { imgSrc: "/Images/emoji6.png", title: "Learn from Mistakes", description: "Practice tests help you learn from your mistakes and improve." }
+    { imgSrc: "/Images/clock-1.png", title: "Improve Time Management", description: "Practice tests help enhance speed and accuracy for real" },
+    { imgSrc: "/Images/analysis-2.png", title: "Analyze Weaknesses", description: "Practice teste helps to identify areas of improvement." },
+    { imgSrc: "/Images/target-3.png", title: "Real Exam Experience", description: "Practice tests help you get familiar with the exam pattern." },
+    { imgSrc: "/Images/anxiety-4.png", title: "Reduce Exam Anxiety", description: "Practice tests help reduce anxiety and stress before exams." },
+    { imgSrc: "/Images/growth-5.png", title: "Track Progress", description: "Practice teste helps to track your progress and performance." },
+    { imgSrc: "/Images/notepad-6.png", title: "Learn from Mistakes", description: "Practice tests help you learn from your mistakes and improve." }
   ];
 
   return (
@@ -50,18 +50,18 @@ function Home() {
           Any Notice or Sentence</marquee> */}
 
         <div className="flex flex-col items-center text-center md:flex-row md:justify-between md:items-center md:mt-2 lg:mt-5 lg:mb-4">
-          <img
-            src="/Images/girllaptop.jpeg"
+          <img 
+            src="/Images/index-exam.png"
             alt="Background"
-            className="w-140 h-90 mt-5 mb-8 md:w-120 md:h-80 md:mt-5 md:mb-10 lg:w-220 lg:h-150 lg:mt-0 lg:mb-10"
+            className="w-140 h-90 mt-5 mb-8 md:w-120 md:h-80 md:mt-5 md:mb-10 lg:w-200 lg:h-160 lg:-mt-8 lg:mb-10 lg:ml-30"
           />
           <div className="flex flex-col items-center">
             <AnimatedHeading />
             <button
               onClick={onClickHandler}
-              className="w-70 h-14 bg-white border-3 border-blue-200
-             text-gray-800 font-semibold text-2xl rounded-lg hover:bg-blue-200
-               not-only: transition ease-in-out text-center lg:text-3xl lg:w-100 lg:h-17 lg:mt-10 lg:mb-10"
+              className="w-70 h-14 bg-white border-3 border-blue-950
+             text-gray-800 font-[sans] font-semibold text-2xl rounded-lg hover:bg-gradient-to-r from-blue-950 via-blue-900 to-blue-950 hover:text-white hover:border-blue-950
+              transition ease-in-out duration-400 text-center lg:text-2xl lg:w-80 lg:h-15 lg:mt-10 lg:mb-10 "
             >
               Proceed To Test
             </button>
