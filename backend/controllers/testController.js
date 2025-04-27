@@ -1,6 +1,6 @@
-const User = require('../models/user'); // Import User model
-const Subject = require('../models/subjects'); // Import Subjects model
-const Question = require('../models/questions'); // Import Question model
+const User = require('../models/user');
+const Subject = require('../models/subjects'); 
+const Question = require('../models/questions'); 
 
 const getTestQuestions = async (req, res, next) => {
     try {
@@ -40,12 +40,13 @@ const getTestQuestions = async (req, res, next) => {
         const trimmedBranchQuestions = branchQuestions.slice(0, 50);
 
         // Step 6: Combine the questions
-        const questions = [...aptitudeQuestions, ...trimmedBranchQuestions];
+        // const questions = [...aptitudeQuestions, ...trimmedBranchQuestions];
 
         // Step 7: Return the questions
         res.json({
             message: "Questions fetched successfully",
-            questions,
+            aptitudeQuestions,
+            technicalQuestions: trimmedBranchQuestions
         });
     } catch (error) {
         next(error);

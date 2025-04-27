@@ -4,7 +4,7 @@ require('dotenv').config();
 const authMiddleware = (req, res, next) => {
      // Extract token from the "Authorization" header
      const authHeader = req.header('Authorization');
-     console.log('Authorization Header:', authHeader); // Debug log
+    //  console.log('Authorization Header:', authHeader); // Debug log
 
      const token = authHeader?.split(' ')[1]; // Extract token from "Bearer <token>"
      console.log('Token:', token); // Debug log
@@ -22,7 +22,7 @@ const authMiddleware = (req, res, next) => {
         req.user = { userId: decoded.userId }; // Attach user ID to the request
         next();
     }catch(error){
-        console.error('Token verification failed:', error.message); // Debug log
+        // console.error('Token verification failed:', error.message); // Debug log
         return res.status(403).json({
             message: "Access denied. Invalid or expired token."
         });
