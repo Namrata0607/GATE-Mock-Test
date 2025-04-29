@@ -27,23 +27,40 @@ const userSchema = new mongoose.Schema({
     },
     attemptedTests : [
         {
-            test :  {
+            testId :  {
                 type: mongoose.Schema.Types.ObjectId,
-                ref: 'Tests' // Reference to the Test model
+                ref: 'Tests'
             },
-            responses : [
+            testResponses : [
                 {
                     question: { 
                         type: mongoose.Schema.Types.ObjectId, 
                         ref: "Questions" 
                     },
-                    obtainedMarks: Number,
-                    correctAnswer: [String],
+                    chosenAnswer: [String],
+                    obtainedMarks: {
+                        type: Number,
+                        default: 0
+                    },
                     attemptedStatus: Boolean
                 }
-            ]
+            ],
+            totalTestMarks: {
+                type: Number,
+                default: 0
+            },
+            sectionwiseTestMarks: {
+                aptitude: { 
+                    type: Number, 
+                    default: 0
+                },
+                technical: { 
+                    type: Number, 
+                    default: 0
+                }
+            },
         }
-    ],
+    ],  
     role : {
         type: String,
         enum : ["User","Staff","Admin"],

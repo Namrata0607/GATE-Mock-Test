@@ -29,7 +29,7 @@ const register = async (req, res, next) => {
             confirmPassword, 
             branch, 
             mobile,
-            attemptedTests: null
+            attemptedTests: [],
         });
         await user.save();
 

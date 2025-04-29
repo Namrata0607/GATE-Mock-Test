@@ -45,7 +45,7 @@ function Home() {
   return (
     <>
       {/* bg-green-50 */}
-      <div className=" h-full w-full">
+      <div className=" h-full w-full overflow-x-hidden">
         {/* <marquee behavior="" direction="" className="text-2xl text-red-600">
           Any Notice or Sentence</marquee> */}
 
@@ -60,7 +60,7 @@ function Home() {
             <button
               onClick={onClickHandler}
               className="w-70 h-14 bg-white border-3 border-blue-950
-             text-gray-800 font-[sans] font-semibold text-2xl rounded-lg hover:bg-gradient-to-r from-blue-950 via-blue-900 to-blue-950 hover:text-white hover:border-blue-950
+             text-gray-800 font-[sans] font-semibold text-2xl rounded-lg hover:bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900 hover:text-white hover:border-blue-900
               transition ease-in-out duration-400 text-center lg:text-2xl lg:w-80 lg:h-15 lg:mt-10 lg:mb-10 "
             >
               Proceed To Test

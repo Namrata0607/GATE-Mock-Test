@@ -9,7 +9,7 @@ const testSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId, 
         ref: "Branch" 
     },
-    subjects: [
+    subjectsData: [
         {
             subject: { 
                 type: mongoose.Schema.Types.ObjectId, 
@@ -25,7 +25,7 @@ const testSchema = new mongoose.Schema({
     ],
     totalMarks: { 
         type: Number,
-        default: 65 
+        default: 100 
     },
     sectionwiseMarks: {
         aptitude: { 
@@ -34,7 +34,7 @@ const testSchema = new mongoose.Schema({
         },
         technical: { 
             type: Number, 
-            default: 50 
+            default: 85 
         }
     },
     createdBy: { 

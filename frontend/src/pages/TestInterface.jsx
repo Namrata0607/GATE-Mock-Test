@@ -19,7 +19,7 @@ function TestUI() {
   useEffect(() => {
     const fetchTestQuestions = async () => {
       try {
-        const response = await fetch("http://localhost:3000/api/test/questions", {
+        const response = await fetch("http://localhost:3000/api/testQuestions/questions", {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -151,7 +151,7 @@ function TestUI() {
         
         {/* Left Section */}
         {/* border-2 border-gray-300 */}
-        <div className="w-2/2 h-full rounded-lg p-4">
+        <div className="w-3/4 h-full rounded-lg p-4">
           <SectionTabs
             currentSection={currentSection}
             setCurrentSection={handleTabSwitch}
@@ -204,14 +204,14 @@ function TestUI() {
 
         {/* Right Panel - Question Pallet */}
         {/* overflow-y-auto */}
-        <div className="w-2/2 h-full rounded-lg p-4">
+        <div className="w-1/4 h-full rounded-lg p-4">
           <div className="mt-4">
             <h2 className="text-xl font-semibold mb-1">
               Chosen Section: {currentSection}
             </h2>
             <p className="text-sm mb-3 text-gray-600">Choose a Question</p>
 
-            <div className="grid grid-cols-4 gap-1 justify-items-center">
+            <div className="grid grid-cols-4 justify-items-center max-h-96 overflow-y-auto">
               {questionStatus.map((status, index) => (
                 <QuestionStatusButtons
                   key={index}

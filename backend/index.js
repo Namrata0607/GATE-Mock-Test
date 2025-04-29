@@ -9,8 +9,9 @@ const userRoutes = require('./routes/authRoutes');
 const staffRoutes = require('./routes/staffRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const questionRoutes = require('./routes/questionsRoutes');
+const testRoutes = require('./routes/testsRoutes');
 const { errorHandler } = require('./middlewares/errorHandler');
-const { authMiddleware } = require('./middlewares/authMiddleware');
+// const { authMiddleware } = require('./middlewares/authMiddleware');
 const branchRoutes = require('./routes/branchRoutes');
 
 
@@ -41,7 +42,8 @@ connectDB();
 app.use('/api/users', userRoutes);
 app.use('/api/staff', staffRoutes);
 app.use('/api', branchRoutes);
-app.use('/api/test', questionRoutes);
+app.use('/api/testQuestions', questionRoutes);
+app.use('/api/test', testRoutes);
 // app.use(authMiddleware); // Apply auth middleware for routes below
 
 

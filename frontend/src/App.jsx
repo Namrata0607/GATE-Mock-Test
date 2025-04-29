@@ -11,15 +11,18 @@ import ULoginSignup from "./pages/UserLoginSignup";
 import Instructions from "./pages/Instructions";
 import PreQuestionP from "./pages/PreQuestionP";
 import TestUI from "./pages/TestInterface";
-import Admin from "./pages/admin";
-import StaffUpload from "./pages/Staff";
+// import Admin from "./pages/admin";
+// import StaffUpload from "./pages/StaffLogin";
+import StaffLogin from "./pages/StaffLogin";
+import StaffDashboard from "./pages/staffDashboard";
+import StaffProfile from "./pages/staffProfile"; // Assuming you have a StaffProfile page
 
 function AppContent() {
   const location = useLocation();
 
   const hideNavbarAndFooterRoutes = ["/testui"];
-  const authRoutes = ["/instructions"]; // update as needed
-  const staffRoutes = ["/staff-upload"]; // for staff access
+  const userRoutes = ["/instructions"]; // update as needed for user access
+  const staffRoutes = ["/staffLogin","/staffDashboard","/staffProfile"]; // for staff access
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
@@ -34,8 +37,8 @@ function AppContent() {
         !hideNavbarAndFooterRoutes.includes(location.pathname) &&
         (
           staffRoutes.includes(location.pathname)
-            ? <StaffNavbar /> // 👈 show custom navbar for staff
-            : (isLoggedIn && authRoutes.includes(location.pathname)
+            ? <StaffNavbar /> // show custom navbar for staff
+            : (isLoggedIn && userRoutes.includes(location.pathname)
               ? <ProfileNavbar />
               : <Navbar />
             )
@@ -49,14 +52,16 @@ function AppContent() {
         <Route path="/instructions" element={<Instructions />} />
         <Route path="/prequestionp" element={<PreQuestionP />} />
         <Route path="/testui" element={<TestUI />} />
-        <Route path="/staff-upload" element={<StaffUpload />} />
+        <Route path="/staffLogin" element={<StaffLogin />} />
+        <Route path="/staffDashboard" element={<StaffDashboard />} />
+        <Route path="/staffProfile" element={<StaffProfile />} /> 
+        {/* Add more routes as needed */}
       </Routes>
 
       {!hideNavbarAndFooterRoutes.includes(location.pathname) && <Footer />}
     </>
   );
 }
-
 
 function App() {
   return (

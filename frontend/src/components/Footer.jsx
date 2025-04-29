@@ -2,7 +2,7 @@ import { FaFacebook, FaTwitter, FaInstagram, FaYoutube } from "react-icons/fa";
 
 function Footer() {
   return(
-    <footer className="absolute w-full bg-gray-100 border-t-2 border-gray-200 shadow-2xs-gray text-gray-800 py-6 mb-0">
+    <footer className="w-full bg-gray-100 border-t-2 border-gray-200 shadow-2xs-gray text-gray-800 py-6 mb-0">
       <div className="container mx-auto flex flex-col md:flex-row justify-between items-center px-5">
         
         {/* Left Side - Platform Info */}

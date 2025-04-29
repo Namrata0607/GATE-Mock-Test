@@ -1,6 +1,7 @@
 const User = require('../models/user');
 const Subject = require('../models/subjects'); 
 const Question = require('../models/questions'); 
+const Tests = require('../models/tests');
 
 const getTestQuestions = async (req, res, next) => {
     try {
@@ -53,4 +54,51 @@ const getTestQuestions = async (req, res, next) => {
     }
 };
 
-module.exports = { getTestQuestions };
+const uploadTests = async (req, res, next) => {
+    try {
+        const { branchId, subjectsData, createdBy  } = req.body;
+        
+        const testCount = await Tests.countDocuments();
+        const newTestName = `Test${testCount + 1}`; // Generate a new test name
+
+        const newTest = new Tests({
+            testName: newTestName,
+            branch: branchId,
+            subjectsData: subjectsData, // [{subject: id, questions: [qid1, qid2]}]
+            createdBy: createdBy,
+        });
+
+        const savedTest = await newTest.save();
+        res.status(201).json({ 
+            testId: savedTest._id, 
+            message: "Test started and uploaded successfully", 
+        }); 
+
+
+    }catch (error) {
+        next(error);
+    }
+}
+
+const submitUserTest = async (req, res, next) => {
+    try {
+        const { testId, testResponses } = req.body;
+        const userId = req.user.userId; 
+
+        await User.findByIdAndUpdate(userId, {
+            $push: {
+                attemptedTests: {
+                    testId: testId,
+                    testResponses: testResponses
+                }
+            }
+        })
+
+        res.status(200).json({ message: "Test submitted successfully" });
+
+    }catch (error) {
+        next(error);
+    }
+}
+
+module.exports = { getTestQuestions, uploadTests, submitUserTest };

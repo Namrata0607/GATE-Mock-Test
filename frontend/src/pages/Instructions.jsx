@@ -59,7 +59,7 @@ function Instructions() {
           <img src="/Images/start_demo.png" alt="GATE_2025" className="h-100 object-cover md:h-150 lg:h-180" />
         </div>
 
-        <div className='container text-center rounded-lg p-4 m-4 w-100 mx-auto h-220 relative shadow-lg bg-gradient-to-r from-blue-950 via-blue-900 to-blue-950 flex flex-col mb-20
+        <div className='container text-center rounded-lg p-4 m-4 w-100 mx-auto h-220 relative shadow-lg bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900 flex flex-col mb-20
         md:w-150 md:h-190 lg:w-150 lg:px-10'>
           <h1 className='text-white text-3xl font-bold font-[Open_Sans] mt-5'>Instructions</h1>
           <div className='h-70 mt-2 p-4 text-left flex-col mb-20'>
@@ -103,7 +103,7 @@ function Instructions() {
             <button onClick={() => setIsPopupOpen(true)}
           className={`border-2 h-10 w-50 my-8 mx-2 rounded-sm ${
             isChecked
-              ? "bg-blue-900 text-white border-blue-200 hover:bg-blue-200 hover:text-black font-semibold font-[Sans] ease-in-out duration-400"
+              ? "bg-blue-800 text-white border-blue-200 hover:bg-blue-200 hover:text-black font-semibold font-[Sans] ease-in-out duration-400"
               : "bg-gray-300 border-gray-300 cursor-not-allowed font-[Sans]"
           }`}
           disabled={!isChecked}
@@ -126,7 +126,7 @@ function Instructions() {
               ✖
             </button>
 
-            <div className="p-2">
+            <div className="p-2 flex flex-col items-center">
               <h2 className="mb-10 text-gray-800 text-xl text-center font-bold font-[Open_Sans]">Please read the following carefully!</h2>
               <div>
                 <ol className="list-decimal list-inside text-gray-800 space-y-2 ml-4">
@@ -153,9 +153,8 @@ function Instructions() {
                 ))}
               </div>
 
-
               <button 
-                className="mt-4 ml-10 md:ml-0 bg-white font-semibold font-[sans] hover:text-white hover:bg-gradient-to-r from-blue-950 via-blue-900 to-blue-950 borteder-blue-200 
+                className="mt-4 bg-white font-semibold font-[sans] hover:text-white hover:bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900 borteder-blue-200 
                 hover:bg-blue-100 border-2 border-blue-950 h-10 w-50 m-2 mb-2 rounded-sm ease-in-out duration-400"
                 onClick={() => onClickHandler("/testui")}
               >

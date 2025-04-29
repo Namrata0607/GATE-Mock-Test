@@ -145,7 +145,7 @@ function ULoginSignup() {
               {isSignup && (
                 <input type="password" name="confirmPassword" placeholder="Confirm Password" value={formData.confirmPassword} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded hover:border-gray-500" required />
               )}
-              <button type="submit" className="w-full text-lg font-semibold font-[sans] bg-white text-gray-800 p-2 rounded transition ease-in-out duration-400 border-3 border-blue-950  hover:bg-gradient-to-r from-blue-950 via-blue-900 to-blue-950 hover:text-white hover:border-blue-950">{isSignup ? "Sign Up" : "Log In"}</button>
+              <button type="submit" className="w-full text-lg font-semibold font-[sans] bg-white text-gray-800 p-2 rounded transition ease-in-out duration-400 border-3 border-blue-950  hover:bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900 hover:text-white hover:border-blue-900">{isSignup ? "Sign Up" : "Log In"}</button>
             </form>
     
             <p className="text-center text-gray-600 mt-4">
