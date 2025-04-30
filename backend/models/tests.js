@@ -30,7 +30,7 @@ const testSchema = new mongoose.Schema({
     sectionwiseMarks: {
         aptitude: { 
             type: Number, 
-            default: 15 
+            default: 25 
         },
         technical: { 
             type: Number, 

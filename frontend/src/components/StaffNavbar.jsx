@@ -15,16 +15,16 @@ function StaffNavbar() {
       <h1 className="font-[Open_Sans] font-bold text-3xl animate-shimmer bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 bg-clip-text text-transparent">
         GATEPREP
       </h1>
-    <div className="hidden lg:flex space-x-5 justify-between items-center">
+    <div>
         <Link
           to="/staffProfile"
           className={`${linkClass} ${
             location.pathname === "/" ? activeClass : inactiveClass
           }`}
         >
-          Home
+          <img src="/Images/profile-staff.png" alt="staff-profile" className="h-12"/>
         </Link>
-      </div>
+    </div>
 </nav>
   );
 }

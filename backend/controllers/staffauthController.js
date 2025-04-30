@@ -1,7 +1,10 @@
-const Staff = require('../models/staff');
+const mongoose = require("mongoose"); 
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
+const Staff = require('../models/staff');
+const Subject = require('../models/subjects');
+const Branch = require('../models/branch');
 
 const staffSignup = async (req, res, next) => {
     try{
@@ -61,5 +64,64 @@ const staffLogin = async (req, res, next) => {
         next(error);
     }
 }
-// paper upload
-module.exports = { staffSignup, staffLogin }
+
+const staffLogout = async ( res, next) => {
+    try {
+        res.clearCookie("token"); // Clear JWT token from cookies
+        return res.status(200).json({ 
+            message: "User logged out successfully!" 
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+const getSubjectsByBranch = async (req, res, next) => {
+    try {
+      const { branch } = req.params;
+  
+      // Find the ObjectId for the branch name
+      const branchDoc = await Branch.findOne({ branchName: branch }); // Use branchName instead of name
+      if (!branchDoc) {
+        return res.status(404).json({ msg: "Branch not found" });
+      }
+  
+      const branchId = branchDoc._id; // Get the ObjectId of the branch
+  
+      // Query the subjects collection using the branch ObjectId
+      const subjects = await Subject.find({ branches: branchId });
+  
+      if (!subjects || subjects.length === 0) {
+        return res.status(404).json({ msg: "No subjects found for this branch" });
+      }
+  
+      res.status(200).json({ msg: "Subjects fetched successfully", subjects });
+    } catch (error) {
+      console.error("Error in getSubjectsByBranch:", error.message);
+      res.status(500).json({ msg: "Internal Server Error", error: error.message });
+    }
+  };
+
+  const updateMarks = async (req, res, next) => {
+    try {
+      const { branchId } = req.params; // Get branchId from the URL
+      const { marks } = req.body; // Get marks from the request body
+  
+      // Loop through the marks object and update each subject
+      for (const subjectId in marks) {
+        const mark = marks[subjectId];
+        await Subject.findByIdAndUpdate(
+          subjectId,
+          { subjectMarks: mark },
+          { new: true } // Return the updated document
+        );
+      }
+  
+      res.status(200).json({ msg: "Marks updated successfully!" });
+    } catch (error) {
+      console.error("Error updating marks:", error.message);
+      res.status(500).json({ msg: "Internal Server Error", error: error.message });
+    }
+  };
+
+module.exports = { staffSignup, staffLogin, staffLogout, getSubjectsByBranch, updateMarks };

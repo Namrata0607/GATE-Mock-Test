@@ -18,9 +18,12 @@ const subjectSchema = new mongoose.Schema({
             type: mongoose.Schema.Types.ObjectId, 
             ref: "Questions" 
         }
-    ]
+    ],
+    subjectMarks: {
+        type: Number,
+        default: 0
+    },
 });
-
 
 // Enforce uniqueness of subjectName per branch
 // subjectSchema.index({ subjectName: 1, branch: 1 }, { unique: true });

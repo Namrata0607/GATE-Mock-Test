@@ -8,6 +8,11 @@ const fileUploadMiddleware = require('../middlewares/fileUploadMiddleware');
 
 router.post('/staffsignin', staffController.staffLogin);
 router.post('/staffsignup', staffController.staffSignup);
+router.post('/staffLogout', staffController.staffLogout);
+router.get('/getSubjectsByBranch/:branch', staffController.getSubjectsByBranch);
+router.post('/setMarks/:branchId', staffController.updateMarks);
+
+
 router.post('/upload-questions', fileUploadMiddleware.single('file'), uploadQuestions);
 // .single('file') is used to handle single file uploads
 // 'file' is the name of the file input field in the form

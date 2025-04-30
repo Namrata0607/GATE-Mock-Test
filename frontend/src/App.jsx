@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import './App.css';
+import { matchPath } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import ProfileNavbar from "./components/ProfileNavbar";
 import StaffNavbar from "./components/StaffNavbar"; 
@@ -15,14 +16,15 @@ import TestUI from "./pages/TestInterface";
 // import StaffUpload from "./pages/StaffLogin";
 import StaffLogin from "./pages/StaffLogin";
 import StaffDashboard from "./pages/staffDashboard";
-import StaffProfile from "./pages/staffProfile"; // Assuming you have a StaffProfile page
+import StaffProfile from "./pages/staffProfile"; 
+import SetMarks from "./pages/setMarks";
 
 function AppContent() {
   const location = useLocation();
 
   const hideNavbarAndFooterRoutes = ["/testui"];
   const userRoutes = ["/instructions"]; // update as needed for user access
-  const staffRoutes = ["/staffLogin","/staffDashboard","/staffProfile"]; // for staff access
+  const staffRoutes = ["/staffLogin","/staffDashboard","/staffProfile","/set-marks/:branchId"]; // for staff access
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
@@ -31,13 +33,16 @@ function AppContent() {
     setIsLoggedIn(!!token);
   }, []);
 
+  // Check if the current route matches any staff route
+  const isStaffRoute = staffRoutes.some((route) => matchPath(route, location.pathname));
+
   return (
     <>
-      {
+       {
         !hideNavbarAndFooterRoutes.includes(location.pathname) &&
         (
-          staffRoutes.includes(location.pathname)
-            ? <StaffNavbar /> // show custom navbar for staff
+          isStaffRoute
+            ? <StaffNavbar /> // Show custom navbar for staff
             : (isLoggedIn && userRoutes.includes(location.pathname)
               ? <ProfileNavbar />
               : <Navbar />
@@ -55,6 +60,7 @@ function AppContent() {
         <Route path="/staffLogin" element={<StaffLogin />} />
         <Route path="/staffDashboard" element={<StaffDashboard />} />
         <Route path="/staffProfile" element={<StaffProfile />} /> 
+        <Route path="/set-marks/:branchId" element={<SetMarks />} /> {/* Pass branchId as a URL parameter */}
         {/* Add more routes as needed */}
       </Routes>
 
