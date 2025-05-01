@@ -9,7 +9,7 @@ import Footer from "./components/Footer";
 import Home from "./pages/Home";
 import ExamGuide from "./pages/ExamGuide";
 import ULoginSignup from "./pages/UserLoginSignup";
-import Instructions from "./pages/Instructions";
+import Instructions from "./pages/userDashboard";
 import PreQuestionP from "./pages/PreQuestionP";
 import TestUI from "./pages/TestInterface";
 // import Admin from "./pages/admin";
@@ -18,55 +18,62 @@ import StaffLogin from "./pages/StaffLogin";
 import StaffDashboard from "./pages/staffDashboard";
 import StaffProfile from "./pages/staffProfile"; 
 import SetMarks from "./pages/setMarks";
+import UserProfile from "./pages/userProfile";
 
 function AppContent() {
   const location = useLocation();
 
   const hideNavbarAndFooterRoutes = ["/testui"];
-  const userRoutes = ["/instructions"]; // update as needed for user access
+  const userRoutes = ["/userDashboard","/userProfile"]; // update as needed for user access
   const staffRoutes = ["/staffLogin","/staffDashboard","/staffProfile","/set-marks/:branchId"]; // for staff access
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("userToken");
     setIsLoggedIn(!!token);
   }, []);
 
   // Check if the current route matches any staff route
   const isStaffRoute = staffRoutes.some((route) => matchPath(route, location.pathname));
 
+  // Check if the current route matches any user route
+  const isUserRoute = userRoutes.some((route) => matchPath(route, location.pathname));
+
   return (
     <>
-       {
+      {
         !hideNavbarAndFooterRoutes.includes(location.pathname) &&
         (
           isStaffRoute
             ? <StaffNavbar /> // Show custom navbar for staff
-            : (isLoggedIn && userRoutes.includes(location.pathname)
-              ? <ProfileNavbar />
-              : <Navbar />
+            : (isLoggedIn && isUserRoute
+              ? <ProfileNavbar /> // Show ProfileNavbar for logged-in users on user routes
+              : <Navbar /> // Default navbar
             )
         )
       }
       <Routes>
-        {/* <Route path="/admin" element={<Admin />} /> */}
+        {/* Define routes */}
         <Route path="/" element={<Home />} />
         <Route path="/examguide" element={<ExamGuide />} />
         <Route path="/uloginsignup" element={<ULoginSignup />} />
-        <Route path="/instructions" element={<Instructions />} />
+        <Route path="/userDashboard" element={<Instructions />} />
         <Route path="/prequestionp" element={<PreQuestionP />} />
         <Route path="/testui" element={<TestUI />} />
         <Route path="/staffLogin" element={<StaffLogin />} />
         <Route path="/staffDashboard" element={<StaffDashboard />} />
-        <Route path="/staffProfile" element={<StaffProfile />} /> 
-        <Route path="/set-marks/:branchId" element={<SetMarks />} /> {/* Pass branchId as a URL parameter */}
+        <Route path="/staffProfile" element={<StaffProfile />} />
+        <Route path="/set-marks/:branchId" element={<SetMarks />} />
+        <Route path="/userProfile" element={<UserProfile />} />
         {/* Add more routes as needed */}
+
       </Routes>
 
       {!hideNavbarAndFooterRoutes.includes(location.pathname) && <Footer />}
     </>
   );
+
 }
 
 function App() {

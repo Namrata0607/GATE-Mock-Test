@@ -95,7 +95,7 @@ function ULoginSignup() {
               setIsSignup(false);
             } else {
               alert("Welcome " + data.user.name + " !!! You are now logged in.");
-              navigate("/instructions");
+              navigate("/userDashboard"); // Redirect to user dashboard
             }
         } else {
           alert(data.error || "Something went wrong");

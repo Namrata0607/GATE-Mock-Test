@@ -49,7 +49,6 @@ function TestUI() {
     Array(totalQuestions).fill("notVisited")
   );
 
-
   const handleQuestionClick = (number) => {
     setSelectedQuestion(number);
 

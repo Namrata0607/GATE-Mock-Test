@@ -106,6 +106,7 @@ const getUserDetails = async (req, res, next) => {
         res.json({ 
             name: user.name,
             branch: user.branch.branchName,
+            email: user.email,
         });
         // console.log(user.branch),
         // console.log(user.name)

@@ -12,7 +12,6 @@ const getTestQuestions = async (req, res, next) => {
         }
 
         const userBranchId = user.branch._id; // Get the branch ObjectId
-        console.log("User's Branch ID:", userBranchId);
 
         // Step 2: Find all subjects where the user's branch is present in the `branches` array
         const subjectsForBranch = await Subject.find({ branches: userBranchId }).populate('questions');
@@ -24,34 +23,88 @@ const getTestQuestions = async (req, res, next) => {
         const aptitudeSubject = subjectsForBranch.find(subject => subject.subjectName === 'Aptitude');
         const branchSpecificSubjects = subjectsForBranch.filter(subject => subject.subjectName !== 'Aptitude');
 
-        // Step 4: Fetch 15 questions from the "Aptitude" subject
+        // Step 4: Fetch 10 Aptitude Questions with total marks = 15
         let aptitudeQuestions = [];
         if (aptitudeSubject) {
-            aptitudeQuestions = aptitudeSubject.questions.slice(0, 15); // Limit to 15 questions
+            const allAptitudeQuestions = aptitudeSubject.questions;
+            aptitudeQuestions = getRandomQuestionsWithMarks(allAptitudeQuestions, 10, 15);
+
+            if (aptitudeQuestions.length !== 10) {
+                return res.status(400).json({
+                    message: "Test not generated because there are not enough questions for the Aptitude section."
+                });
+            }
         }
 
-        // Step 5: Fetch 50 questions from branch-specific subjects
-        const branchQuestions = [];
+        // Step 5: Fetch Branch-Specific Questions with total marks = 85
+        const branchSpecificQuestions = [];
+        let totalBranchMarks = 0;
+
         for (const subject of branchSpecificSubjects) {
-            branchQuestions.push(...subject.questions);
-            if (branchQuestions.length >= 50) break; // Limit to 50 questions
+            const allSubjectQuestions = subject.questions;
+            const subjectMarks = subject.subjectMarks;
+
+            const subjectQuestions = getRandomQuestionsWithMarks(allSubjectQuestions, null, subjectMarks);
+
+            if (subjectQuestions.length === 0) {
+                return res.status(400).json({
+                    message: `Test not generated because there are not enough questions for the ${subject.subjectName} subject.`
+                });
+            }
+
+            branchSpecificQuestions.push({
+                subjectName: subject.subjectName,
+                questions: subjectQuestions
+            });
+
+            totalBranchMarks += subjectMarks;
         }
 
-        // Trim to exactly 50 questions if more were added
-        const trimmedBranchQuestions = branchQuestions.slice(0, 50);
+        if (totalBranchMarks !== 85) {
+            return res.status(400).json({
+                message: "Test not generated because the total marks for branch-specific subjects do not add up to 85."
+            });
+        }
 
-        // Step 6: Combine the questions
-        // const questions = [...aptitudeQuestions, ...trimmedBranchQuestions];
+        // Step 6: Shuffle Questions
+        aptitudeQuestions = shuffleArray(aptitudeQuestions);
+        branchSpecificQuestions.forEach(subject => {
+            subject.questions = shuffleArray(subject.questions);
+        });
 
-        // Step 7: Return the questions
+        // Step 7: Return Separate Sections
         res.json({
             message: "Questions fetched successfully",
             aptitudeQuestions,
-            technicalQuestions: trimmedBranchQuestions
+            branchSpecificQuestions
         });
     } catch (error) {
         next(error);
     }
+};
+
+// Helper function to fetch random questions with specific marks
+const getRandomQuestionsWithMarks = (questions, questionLimit, totalMarks) => {
+    const shuffledQuestions = shuffleArray(questions);
+    const selectedQuestions = [];
+    let currentMarks = 0;
+
+    for (const question of shuffledQuestions) {
+        if (questionLimit && selectedQuestions.length >= questionLimit) break;
+        if (currentMarks + question.marks > totalMarks) continue;
+
+        selectedQuestions.push(question);
+        currentMarks += question.marks;
+
+        if (currentMarks === totalMarks) break;
+    }
+
+    return currentMarks === totalMarks ? selectedQuestions : [];
+};
+
+// Helper function to shuffle an array
+const shuffleArray = (array) => {
+    return array.sort(() => Math.random() - 0.5);
 };
 
 const uploadTests = async (req, res, next) => {
