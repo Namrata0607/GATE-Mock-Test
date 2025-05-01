@@ -68,6 +68,7 @@ const login = async (req, res ,next) => {
         console.log('Generated Token:', token); // Debug log
         res.json({
             token,
+            role: "user",
             user : {
                 id: user._id,
                 name: user.name,
@@ -82,17 +83,16 @@ const login = async (req, res ,next) => {
 
 const logout = async (req, res) => {
     try {
-        res.clearCookie("token"); // Clear JWT token from cookies
-        return res.status(200).json({ 
-            message: "User logged out successfully!" 
-        });
+      return res.status(200).json({
+        message: "User logged out successfully!",
+      });
     } catch (error) {
-        return res.status(500).json({ 
-            message: "Error logging out", 
-            error 
-        });
+      return res.status(500).json({
+        message: "Error logging out",
+        error,
+      });
     }
-};
+  };
 
 const getUserDetails = async (req, res, next) => {
     try {

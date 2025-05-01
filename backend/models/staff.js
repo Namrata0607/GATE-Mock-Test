@@ -15,6 +15,18 @@ const staffSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    uploadedFiles:[
+        {
+            fileName: {
+                type: String,
+                required: true
+            },
+            uploadedAt:{
+                type: Date,
+                default: Date.now
+            }
+        }
+    ],
 },{ timestamps: true });
 
 staffSchema.pre('save', async function (next) {

@@ -34,24 +34,35 @@ function ProfileNavbar(){
   if (!user) return <p>Loading...</p>;
 
   const handleLogout = async () => {
-    try {
-        const response = await fetch("http://localhost:3000/api/users/logout/", {
-            method: "POST",
-            credentials: "include", // Ensure cookies are included
-        });
 
-        const data = await response.json();
+    try {
+      // Call the backend logout route
+      const response = await fetch("http://localhost:3000/api/users/logout/", {
+        method: "POST",
+        credentials: "include", // Ensure cookies are included
+      });
+      
+      const data = await response.json();
+      
         if (response.ok) {
-            alert(data.message);
-            localStorage.removeItem("token"); // Clear token from storage
+          alert(data.message);
+          
+          const role = localStorage.getItem("userToken") ? "user" : "staff";
+            if (role === "user") {
+              localStorage.removeItem("userToken");
+              localStorage.removeItem("userName");
+            } else if (role === "staff") {
+              localStorage.removeItem("staffToken");
+              localStorage.removeItem("staffName");
+            }
             window.location.href = "/"; // Redirect to login page
-        } else {
+          } else {
             alert("Logout failed: " + data.message);
+          }
+        } catch (error) {
+          console.error("Logout error:", error);
         }
-    } catch (error) {
-        console.error("Logout error:", error);
-    }
-};
+      };
   
 return(
     <nav className="bg-gray-100 border-b-2 border-gray-200 shadow-2xs-gray h-15 md:h-16 lg:h-16 w-full flex justify-between items-center text-gray-800 p-5 ">

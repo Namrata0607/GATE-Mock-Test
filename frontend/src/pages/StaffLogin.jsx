@@ -19,16 +19,16 @@ function StaffLoginSignup() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     if (isSignup && formData.password !== formData.confirmPassword) {
       alert("Passwords do not match!");
       return;
     }
-
+  
     const apiUrl = isSignup
       ? "http://localhost:3000/api/staff/staffsignup/"
       : "http://localhost:3000/api/staff/staffsignin/";
-
+  
     const requestData = isSignup
       ? {
           name: formData.name,
@@ -41,7 +41,7 @@ function StaffLoginSignup() {
           email: formData.email,
           password: formData.password,
         };
-
+  
     try {
       const response = await fetch(apiUrl, {
         method: "POST",
@@ -50,14 +50,22 @@ function StaffLoginSignup() {
         },
         body: JSON.stringify(requestData),
       });
+  
+      const data = await response.json(); // Parse JSON response
+  
+      if (response.ok && data.token) {
 
-      const text = await response.text(); // Read raw response
-      const data = JSON.parse(text);
-
-      if (response.ok) {
-        // Save the token to localStorage
-        localStorage.setItem("authToken", data.token);
-
+        if (data.role === "user") {
+          localStorage.setItem("userToken", data.token);
+          localStorage.setItem("userName", data.user.name);
+        } else if (data.role === "staff") {
+          localStorage.setItem("staffToken", data.token);
+          localStorage.setItem("staffName", data.staff.name);
+        }
+  
+        // Save the token with a consistent key
+        // localStorage.setItem("token", data.token);
+  
         if (isSignup) {
           alert("Welcome " + data.staff.name + " !!! You have successfully signed up.");
           setIsSignup(false); // Switch to login after signup
@@ -73,6 +81,8 @@ function StaffLoginSignup() {
       alert("Error connecting to the server. Check console.");
     }
   };
+  
+  
 
   return (
     <div className="flex flex-col items-center justify-center lg:flex-row lg:justify-between lg:items-center lg:mt-10 lg:mr-10 lg:mb-10">

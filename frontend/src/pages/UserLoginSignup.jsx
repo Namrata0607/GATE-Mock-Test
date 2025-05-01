@@ -81,23 +81,22 @@ function ULoginSignup() {
         
         const data = JSON.parse(text);
   
-        if (response.ok) {
-          // Save the token to localStorage
-          localStorage.setItem("authToken", data.token);
-          // localStorage.setItem("userName", data.user.name); // Store the username
-
-            if (isSignup) {
-            alert("Welcome " + data.user.name + " !!! You have successfully signed up.");
-            setIsSignup(false);
-            } else {
-            alert("Welcome " + data.user.name + " !!! You are now logged in.");
-            navigate("/instructions");
+        if (response.ok && data.token) {
+            if (data.role === "user") {
+              localStorage.setItem("userToken", data.token);
+              localStorage.setItem("userName", data.user.name);
+            } else if (data.role === "staff") {
+              localStorage.setItem("staffToken", data.token);
+              localStorage.setItem("staffName", data.staff.name);
             }
-          if (isSignup) {
-            setIsSignup(false);
-          } else {
-            navigate("/instructions");
-          }
+          
+            if (isSignup) {
+              alert("Welcome " + data.user.name + " !!! You have successfully signed up.");
+              setIsSignup(false);
+            } else {
+              alert("Welcome " + data.user.name + " !!! You are now logged in.");
+              navigate("/instructions");
+            }
         } else {
           alert(data.error || "Something went wrong");
         }

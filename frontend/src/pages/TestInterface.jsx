@@ -23,7 +23,7 @@ function TestUI() {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
         });
         if (!response.ok) {
@@ -79,8 +79,10 @@ function TestUI() {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const token = localStorage.getItem('authToken'); // Retrieve token from localStorage
+        // Retrieve the correct token from localStorage
+        const token = localStorage.getItem('userToken') || localStorage.getItem('staffToken');
         console.log("Token:", token); // Debug log
+        
         if
          (!token) {
           console.error('No token found. User is not logged in.');

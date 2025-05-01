@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect ,useCallback } from "react";
 import { useParams } from "react-router-dom";
 
 function SetMarks() {
@@ -6,27 +6,36 @@ function SetMarks() {
   const [subjects, setSubjects] = useState([]); // State to store subjects
   const [marks, setMarks] = useState({}); // State to store marks for each subject
 
-  useEffect(() => {
-    // Fetch subjects for the selected branch from the backend
-    const fetchSubjects = async () => {
-      try {
-        const response = await fetch(`http://localhost:3000/api/staff/getSubjectsByBranch/${branchId}`);
-        if (!response.ok) {
-          throw new Error("Failed to fetch subjects");
-        }
-        const data = await response.json();
-        setSubjects(data.subjects); // Set subjects in state
-      } catch (error) {
-        console.error("Error fetching subjects:", error.message);
+
+  const fetchSubjects = useCallback(async () => {
+    try {
+      console.log("Fetching subjects..."); // Debug log
+
+      const token = localStorage.getItem("staffToken");
+      console.log("Token from localStorage:", token); // Debug log
+      
+      const response = await fetch(`http://localhost:3000/api/staff/getSubjectsByBranch/${branchId}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+  
+      if (!response.ok) {
+        throw new Error("Failed to fetch subjects");
       }
-    };
-
-    fetchSubjects();
-  }, [branchId]);
-
+  
+      const data = await response.json();
+      setSubjects(data.subjects);
+    } catch (error) {
+      console.error("Error fetching subjects:", error.message);
+    }
+  }, [branchId]); // Add branchId as a dependency
+  
   useEffect(() => {
-    console.log("Subjects state updated:", subjects); // Debug log
-  }, [subjects]);
+    fetchSubjects(); // Call fetchSubjects to fetch data on component mount
+  }, [fetchSubjects]); // Add fetchSubjects to the dependency array
 
   const handleMarksChange = (subjectId, value) => {
     setMarks({ ...marks, [subjectId]: value }); // Update marks for the subject
@@ -35,7 +44,7 @@ function SetMarks() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch(`http://localhost:3000/api/marks/${branchId}`, {
+      const response = await fetch(`http://localhost:3000/api/staff/setMarks/${branchId}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -45,6 +54,7 @@ function SetMarks() {
 
       if (response.ok) {
         alert("Marks updated successfully!");
+        window.location.href = "/staffDashboard";
       } else {
         alert("Failed to update marks");
       }
@@ -95,7 +105,7 @@ function SetMarks() {
         <div className="flex justify-end mt-6">
           <button
             type="submit"
-            className="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600"
+            className="flex hover:bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900 border-2 border-blue-900 hover:text-white text-gray-800 font-semibold px-6 py-2 rounded justify-center items-center hover:bg-white transition duration-300 ease-in-out align-center"
           >
             Save Marks
           </button>

@@ -52,11 +52,14 @@ const staffLogin = async (req, res, next) => {
         }
 
         const token = jwt.sign({ staffId: staff._id }, process.env.JWT_SECRET, { expiresIn: "1h" });
+        
         res.status(200).json({
             msg: "Staff logged in successfully",
             token,
+            role: "staff",
             staff: {
                 id: staff._id,
+                name: staff.name,
                 email: staff.email
             }
         })
@@ -65,16 +68,46 @@ const staffLogin = async (req, res, next) => {
     }
 }
 
-const staffLogout = async ( res, next) => {
+const staffLogout = async (req, res) => {
     try {
-        res.clearCookie("token"); // Clear JWT token from cookies
-        return res.status(200).json({ 
-            message: "User logged out successfully!" 
-        });
+      return res.status(200).json({
+        message: "Staff logged out successfully!",
+      });
     } catch (error) {
+      return res.status(500).json({
+        message: "Error logging out",
+        error,
+      });
+    }
+  };
+  
+const getStaffDetails = async (req, res, next) => {
+    try {
+        const staff = await Staff.findById(req.staff.staffId); 
+        if (!staff) {
+            return res.status(404).json({ 
+                message: "Staff not found" 
+            });
+        }
+
+        const response = {
+            name: staff.name,
+            email: staff.email,
+        };
+
+        // Include password if needed (e.g., for change password functionality)
+        // if (req.query.includePassword === 'true') {
+        //     response.password = staff.password;
+        // }
+
+        res.json(response);
+
+    } catch (error) {
+        console.error("Error fetching staff details:", error.message);
         next(error);
     }
 };
+
 
 const getSubjectsByBranch = async (req, res, next) => {
     try {
@@ -102,7 +135,7 @@ const getSubjectsByBranch = async (req, res, next) => {
     }
   };
 
-  const updateMarks = async (req, res, next) => {
+const updateMarks = async (req, res, next) => {
     try {
       const { branchId } = req.params; // Get branchId from the URL
       const { marks } = req.body; // Get marks from the request body
@@ -122,6 +155,19 @@ const getSubjectsByBranch = async (req, res, next) => {
       console.error("Error updating marks:", error.message);
       res.status(500).json({ msg: "Internal Server Error", error: error.message });
     }
-  };
+};
 
-module.exports = { staffSignup, staffLogin, staffLogout, getSubjectsByBranch, updateMarks };
+const fetchUploadedFiles = async (req, res, next) => {
+    try {
+      const staff = await Staff.findById(req.staff.staffId);
+      if (!staff) {
+        return res.status(404).json({ message: "Staff not found" });
+      }
+      res.status(200).json(staff.uploadedFiles);
+    } catch (error) {
+        res.status(500).json({ message: "Error fetching uploaded files", error });
+    }
+}
+
+module.exports = { staffSignup, staffLogin, staffLogout, getStaffDetails, 
+                  getSubjectsByBranch, updateMarks, fetchUploadedFiles };
