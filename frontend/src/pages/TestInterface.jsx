@@ -17,6 +17,27 @@ function TestUI() {
   const [selectedAnswer, setSelectedAnswer] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const [popupData, setPopupData] = useState(null);
+  const [showPopup, setShowPopup] = useState(false);
+
+  function Popup({ data, onClose }) {
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center overflow-y-auto">
+        <div className="bg-white p-6 rounded-lg shadow-lg w-3/4 max-w-lg">
+          <h2 className="text-xl font-bold mb-4">Test Data</h2>
+          <pre className="bg-gray-100 p-4 rounded-lg text-sm overflow-auto">
+            {JSON.stringify(data, null, 2)}
+          </pre>
+          <button
+            onClick={onClose}
+            className="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   let chosenAnswers = JSON.parse(localStorage.getItem('chosenAnswers')) || [];
 
@@ -85,6 +106,7 @@ async function submitTest(branchId, createdBy) {
   const testResponses = JSON.parse(localStorage.getItem("chosenAnswers")) || [];
   const subjectsData = JSON.parse(localStorage.getItem("subjectsData")) || [];
 
+
   if (testResponses.length === 0) {
     alert("No answers have been saved. Please attempt some questions before submitting.");
     return;
@@ -100,8 +122,10 @@ async function submitTest(branchId, createdBy) {
   );
   
   if (!isValidSubjectsData) {
+    console.log("subjectsData:", subjectsData); // Log the invalid subjectsData for debugging
+    // Log the invalid subjectsData for debugging
     alert("Invalid subject data. Please reload the test.");
-    return;
+    //return;
   }
 
   // Prepare the payload for uploading the test
@@ -125,19 +149,29 @@ async function submitTest(branchId, createdBy) {
     });
 
     const result = await response.json();
+    console.log("Response:", result); // Log the response for debugging
+
     if (response.ok) {
       alert(result.message);
 
+      
       // Submit the test for the user
       await submitUserTest(result.testId, testResponses);
+      
+      // Show the popup with the returned data
+      setPopupData(result.testData); // Store the returned data
+      setShowPopup(true); // Show the popup
 
       // Clear localStorage after submission
       localStorage.removeItem("chosenAnswers");
       localStorage.removeItem("subjectsData");
 
-      console.log("Received Subjects Data:", subjectsData);    } else {
-      
-        alert("Error: " + result.message);
+      console.log("Received Subjects Data:", subjectsData);
+
+      alert("Test submitted successfully!");
+        } else {
+
+      console.error("Error:", result.message);
     }
   } catch (error) {
     console.error("Error submitting test:", error);
@@ -154,6 +188,7 @@ async function submitUserTest(testId, testResponses) {
     }
 
   try {
+
       // Prepare the payload for updating the user's document
       const payload = {
           testId: testId,
@@ -211,47 +246,102 @@ async function submitUserTest(testId, testResponses) {
   };
 
   useEffect(() => {
-    const fetchTestQuestions = async () => {
-      try {
-        const token = localStorage.getItem("userToken");
-        if (!token) {
-          throw new Error("Authorization token is missing.");
-        }
+//     const fetchTestQuestions = async () => {
+//       try {
+//         const token = localStorage.getItem("userToken");
+//         if (!token) {
+//           throw new Error("Authorization token is missing.");
+//         }
     
-        const response = await fetch("http://localhost:3000/api/testQuestions/getTestQuestions", {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        });
+//         const response = await fetch("http://localhost:3000/api/testQuestions/getTestQuestions", {
+//           method: "GET",
+//           headers: {
+//             "Content-Type": "application/json",
+//             Authorization: `Bearer ${token}`,
+//           },
+//         });
     
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.message || "Failed to fetch test questions");
-        }
+//         if (!response.ok) {
+//           const errorData = await response.json();
+//           throw new Error(errorData.message || "Failed to fetch test questions");
+//         }
     
-        const data = await response.json();
+//         const data = await response.json();
     
-        // Ensure data exists before setting state
-        setAptitudeQuestions(data.aptitudeQuestions || []);
-        setTechnicalQuestions(
-          (data.branchSpecificQuestions || []).flatMap((subject) => subject.questions || [])
-        );
-        setQuestionStatus(Array((data.aptitudeQuestions || []).length).fill("notVisited"));
+//         // Ensure data exists before setting state
+//         setAptitudeQuestions(data.aptitudeQuestions || []);
+//         setTechnicalQuestions(
+//           (data.branchSpecificQuestions || []).flatMap((subject) => subject.questions || [])
+//         );
+//         setQuestionStatus(Array((data.aptitudeQuestions || []).length).fill("notVisited"));
     
-        // Prepare subjectsData dynamically
-        const subjectsData = (data.branchSpecificQuestions || []).map((subject) => ({
-          subject: subject._id, // Use valid ObjectId for the subject
-          questions: (subject.questions || []).map((q) => q._id), // Use valid ObjectIds for questions
-        }));
+//         // Prepare subjectsData dynamically
+//         const subjectsData = (data.branchSpecificQuestions || []).map((subject) => ({
+//           subject: subject._id, // Use valid ObjectId for the subject
+//           questions: (subject.questions || []).map((q) => q._id), // Use valid ObjectIds for questions
+//         }));
     
-        localStorage.setItem("subjectsData", JSON.stringify(subjectsData)); // Save to localStorage for later use
-      } catch (error) {
-        console.error("Error fetching test questions:", error.message);
-        setError(error.message);
+//         localStorage.setItem("subjectsData", JSON.stringify(subjectsData));
+        
+// console.log("branchSpecificQuestions:", data.branchSpecificQuestions);
+// console.log("Prepared subjectsData:", subjectsData);// Save to localStorage for later use
+//       } catch (error) {
+//         console.error("Error fetching test questions:", error.message);
+//         setError(error.message);
+//       }
+//     };
+const fetchTestQuestions = async () => {
+  try {
+    const token = localStorage.getItem("userToken");
+    if (!token) {
+      throw new Error("Authorization token is missing.");
+    }
+
+    const response = await fetch("http://localhost:3000/api/testQuestions/getTestQuestions", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "Failed to fetch test questions");
+    }
+
+    const data = await response.json();
+
+    console.log("branchSpecificQuestions:", data.branchSpecificQuestions);
+
+    // Ensure data exists before setting state
+    setAptitudeQuestions(data.aptitudeQuestions || []);
+    setTechnicalQuestions(
+      (data.branchSpecificQuestions || []).flatMap((subject) => subject.questions || [])
+    );
+    setQuestionStatus(Array((data.aptitudeQuestions || []).length).fill("notVisited"));
+
+    // Prepare subjectsData dynamically
+    const subjectsData = (data.branchSpecificQuestions || []).map((subject, index) => {
+      if (!subject || !subject._id || !Array.isArray(subject.questions)) {
+        console.warn(`Invalid subject at index ${index}:`, subject);
+        return null; // Skip invalid subjects
       }
-    };
+
+      return {
+        subject: subject._id, // Use _id instead of subjectName
+        questions: subject.questions.map((q) => q._id), // Use valid ObjectIds for questions
+      };
+    }).filter(Boolean); // Remove null entries
+
+    console.log("Prepared subjectsData:", subjectsData);
+
+    localStorage.setItem("subjectsData", JSON.stringify(subjectsData));
+  } catch (error) {
+    console.error("Error fetching test questions:", error.message);
+    setError(error.message);
+  }
+};
     fetchTestQuestions();
   }, []);
 
@@ -431,12 +521,12 @@ async function submitUserTest(testId, testResponses) {
             </button>
             <button
               onClick={() => {
-                  if (!isSubmitting) {
-                      console.log('Branch ID:', user.branchId);
-                      console.log('Created By:', user._id);
-                      setIsSubmitting(true); // Disable the button
-                      submitTest(user.branchId, [], user._id); // Pass branchId
-                  }
+                if (!isSubmitting) {
+                  console.log("Branch ID:", user.branchId);
+                  console.log("Created By:", user._id);
+                  setIsSubmitting(true); // Disable the button
+                  submitTest(user.branchId, user._id); // Pass user._id as createdBy
+                }
               }}
               disabled={isSubmitting} // Disable the button after the first click
               className={`flex hover:bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900 border-2 border-blue-900
@@ -446,6 +536,13 @@ async function submitUserTest(testId, testResponses) {
           >
               Submit Test
           </button>
+          {/* Popup for displaying data */}
+          {showPopup && (
+            <Popup
+              data={popupData}
+              onClose={() => setShowPopup(false)} // Close the popup
+            />
+          )}
           </div>
         </div>
 
