@@ -137,12 +137,17 @@ const getSubjectsByBranch = async (req, res, next) => {
 
 const updateMarks = async (req, res, next) => {
     try {
+
+      console.log("Branch ID:", req.params.branchId); // Debug log
+      console.log("Marks Object:", req.body.marks); // Debug log
+
       const { branchId } = req.params; // Get branchId from the URL
       const { marks } = req.body; // Get marks from the request body
   
       // Loop through the marks object and update each subject
       for (const subjectId in marks) {
         const mark = marks[subjectId];
+        console.log(`Updating subject ${subjectId} with marks: ${mark}`); // Debug log
         await Subject.findByIdAndUpdate(
           subjectId,
           { subjectMarks: mark },
@@ -154,6 +159,7 @@ const updateMarks = async (req, res, next) => {
     } catch (error) {
       console.error("Error updating marks:", error.message);
       res.status(500).json({ msg: "Internal Server Error", error: error.message });
+      next(error);
     }
 };
 

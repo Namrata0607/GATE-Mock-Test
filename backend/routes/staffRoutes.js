@@ -2,10 +2,8 @@ const express = require('express');
 const router = express.Router();
 const staffController = require('../controllers/staffauthController');
 const { uploadQuestions } = require('../controllers/questionsController');
-// console.log('uploadQuestions:', uploadQuestions);
 const fileUploadMiddleware = require('../middlewares/fileUploadMiddleware');
 const { staffAuthMiddleware } = require('../middlewares/staffAuthMiddleware');    
-
 
 router.post('/staffsignin', staffController.staffLogin);
 router.post('/staffsignup', staffController.staffSignup);
@@ -18,8 +16,7 @@ router.get('/getStaffDetails', staffAuthMiddleware, staffController.getStaffDeta
 router.get('/getUploadedFiles', staffAuthMiddleware, staffController.fetchUploadedFiles);
 
 
-router.post('/upload-questions',staffAuthMiddleware, fileUploadMiddleware.single('file'), uploadQuestions);
-// .single('file') is used to handle single file uploads
+router.post('/upload-questions', staffAuthMiddleware, fileUploadMiddleware.single('file'), uploadQuestions);// .single('file') is used to handle single file uploads
 // 'file' is the name of the file input field in the form
 
 module.exports = router;

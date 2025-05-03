@@ -7,13 +7,15 @@ const testSchema = new mongoose.Schema({
     },//like test1, test2, test3
     branch: { 
         type: mongoose.Schema.Types.ObjectId, 
-        ref: "Branch" 
+        ref: "Branch",
+        required: true
     },
     subjectsData: [
         {
             subject: { 
                 type: mongoose.Schema.Types.ObjectId, 
-                ref: "Subjects" 
+                ref: "Subjects",
+                required: true
             },
             questions: [
                 { 
@@ -39,7 +41,8 @@ const testSchema = new mongoose.Schema({
     },
     createdBy: { 
         type: mongoose.Schema.Types.ObjectId, 
-        ref: "Staff" 
+        ref: "Staff",
+        required: true
     },
     createdAt: { 
         type: Date, 

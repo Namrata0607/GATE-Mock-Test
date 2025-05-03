@@ -103,11 +103,14 @@ const getUserDetails = async (req, res, next) => {
             });
         }
         // console.log('user data:',user);
-        res.json({ 
+        res.json({
             name: user.name,
-            branch: user.branch.branchName,
+            branchId: user.branch._id, // Send branch ID
+            branchName: user.branch.branchName, // Send branch name
+            _id: user._id, // Send user ID
             email: user.email,
         });
+
         // console.log(user.branch),
         // console.log(user.name)
     } catch (error) {

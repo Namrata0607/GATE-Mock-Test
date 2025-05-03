@@ -6,12 +6,32 @@ const questionSchema = new mongoose.Schema({
         required: true 
     },
     queImg: { 
-        type: String 
+        type: String, 
+        default: null
     }, // URL of question image
 
     options: [String],
 
-    correctAnswer: [String], // Can store multiple correct answers (for MSQ type)
+    correctAnswer: { 
+        type: [String], // Store as an array of strings
+        required: true,
+        validate: {
+            validator: function (value) {
+                // Validation based on queType
+                if (this.queType === "MCQ" && value.length !== 1) {
+                    return false; // MCQ should have exactly one correct answer
+                }
+                if (this.queType === "MSQ" && value.length < 1) {
+                    return false; // MSQ should have at least two correct answers
+                }
+                if (this.queType === "NAT" && value.length !== 1) {
+                    return false; // NAT should have exactly one correct answer
+                }
+                return true;
+            },
+            message: "Invalid correctAnswer for the given queType."
+        }
+    },
     
     queType: { 
         type: String, 

@@ -46,14 +46,16 @@ const handleLogout = async () => {
   useEffect(() => {
 
     // Fetch user data from API
-          const fetchUserData = async () => {
-            try {
-              const data = await fetchData('http://localhost:3000/api/users/userdetails');
-              setUserDetails(data);
-            } catch (err) {
-              setError(err.message);
-            }
-          };
+    const fetchUserData = async () => {
+      try {
+          const data = await fetchData('http://localhost:3000/api/users/userdetails');
+          console.log('Fetched User Details:', data); // Debug log
+          setUserDetails(data);
+      } catch (err) {
+          console.error('Error fetching user details:', err.message);
+          setError(err.message);
+      }
+  };
       
           fetchUserData();
 
@@ -104,7 +106,7 @@ const handleLogout = async () => {
               className="h-24 w-24 rounded-full mx-auto mb-4"
             />
             <h2 className="text-center text-xl font-bold">{userDetails.name}</h2>
-            <p className="text-center text-gray-600">{userDetails.branch}</p>
+            <p className="text-center text-gray-600">{userDetails.branchName}</p>
             <p className="text-center text-gray-600">{userDetails.email}</p>
             <button className="mt-4 bg-green-500 text-white px-4 py-2 rounded-lg w-full">
               Edit Profile

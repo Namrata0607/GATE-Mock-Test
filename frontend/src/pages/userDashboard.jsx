@@ -47,11 +47,6 @@ function Instructions() {
  
   return (
     <div className='flex flex-col items-center justify-center'>
-      <div className='container text-center border-2 border-gray-300 w-100 mx-auto h-100 mt-10 shadow-lg bg-gray-100'>
-        <h1>Test Attempted details</h1>
-        <p className="text-lg font-semibold">Welcome! {user.name}</p>
-        {/* <p>{localStorage.getItem('username')}</p> */}
-      </div>
 
       <div className='lg:flex lg:flex-row lg:justify-center lg:items-center'>
 

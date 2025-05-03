@@ -12,6 +12,7 @@ const connectDB = async () => {
         console.log(error);
         process.exit(1);
     }
+    // console.log(mongoose);
 }
 
 module.exports = {connectDB};

@@ -8,6 +8,16 @@ function StaffDashboard() {
   const [file, setFile] = useState(null); // State for the uploaded file
   const [error, setError] = useState(null); // State to handle errors
 
+  const branchesList = [
+      "Computer Science and Information Technology",
+      "Mechanical Engineering",
+      "Civil Engineering",
+      "Electrical Engineering",
+      "Electronics and Communication Engineering",
+      "Chemical Engineering",
+      "Architecture and Planning",
+    ]
+
   // Fetch branches from the API
   useEffect(() => {
     const fetchBranches = async () => {
@@ -32,55 +42,81 @@ function StaffDashboard() {
   };
 
   const handleBranchSelection = (e) => {
-    const options = e.target.options;
-    const selected = [];
-    for (let i = 0; i < options.length; i++) {
-      if (options[i].selected) {
-        selected.push(options[i].value);
-      }
+    const { value, checked } = e.target;
+  
+    if (checked) {
+      // Add the branch to the selectedBranches array
+      setSelectedBranches((prev) => [...prev, value]);
+    } else {
+      // Remove the branch from the selectedBranches array
+      setSelectedBranches((prev) => prev.filter((branch) => branch !== value));
     }
-    setSelectedBranches(selected);
-    console.log("Selected Branches:", selected); // Debug log
   };
+  
+  // Log the updated selectedBranches array
+  useEffect(() => {
+    console.log("Selected Branches:", selectedBranches);
+  }, [selectedBranches]);
+
 
   const handleFileChange = (e) => {
     const uploadedFile = e.target.files[0];
+
+    // Validate file type
+    if (uploadedFile && uploadedFile.type !== "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") {
+        alert("Invalid file type. Please upload a .xlsx file.");
+        setFile(null); // Reset the file state
+        return;
+    }
+
     setFile(uploadedFile);
     console.log("Selected File:", uploadedFile); // Debug log
   };
 
   const handleFileUpload = async () => {
     if (!file) {
-      alert("Please select a file to upload.");
-      return;
+        alert("Please select a file to upload.");
+        return;
     }
     if (selectedBranches.length === 0) {
-      alert("Please select at least one branch.");
-      return;
+        alert("Please select at least one branch.");
+        return;
     }
 
     const formData = new FormData();
     formData.append("file", file);
     formData.append("branches", JSON.stringify(selectedBranches)); // Send branches as JSON
 
-    try {
-      const response = await fetch("http://localhost:3000/api/staff/upload-questions", {
-        method: "POST",
-        body: formData, // Send file and branches
-      });
+    // Debugging: Log FormData
+    console.log("FormData being sent:");
+    for (let pair of formData.entries()) {
+        console.log(pair[0] + ": ", pair[1]);
+    }
 
-      const data = await response.json();
-      if (response.ok) {
-        alert("File uploaded successfully!");
-      } else {
-        alert("File upload failed: " + data.message);
-      }
+    try {
+        const token = localStorage.getItem("staffToken"); // Retrieve the token from localStorage
+
+        const response = await fetch("http://localhost:3000/api/staff/upload-questions", {
+            method: "POST",
+            headers: {
+                Authorization: `Bearer ${token}`, // Add the token to the Authorization header
+            },
+            body: formData, // Send file and branches
+        });
+
+        const data = await response.json();
+        if (response.ok) {
+            alert("File uploaded successfully!");
+        } else {
+            console.error("Error response from server:", data);
+            alert("File upload failed: " + data.message);
+        }
     } catch (error) {
-      console.error("Error uploading file:", error);
-      alert("An error occurred while uploading the file.");
+        console.error("Error uploading file:", error);
+        alert("An error occurred while uploading the file.");
     }
   };
-
+  
   if (error) {
     return <div className="text-red-500">Error: {error}</div>;
   }
@@ -118,6 +154,12 @@ function StaffDashboard() {
             placeholder="Upload your file here"
             onChange={handleFileChange}
         />
+        {/* Display selected file name */}
+        {file && (
+            <p className="text-gray-600 mt-2">
+                Selected File: <span className="font-semibold">{file.name}</span>
+            </p>
+        )}
 
         <p className="text-gray-500 mb-4 -mt-2">
             Upload file in only .xlsx file format!
@@ -128,19 +170,19 @@ function StaffDashboard() {
             Select Branches:
         </label>
         <div className="checkbox-group grid grid-cols-2 gap-4 w-full mb-4">
-            {branches.map((branch) => (
-            <div key={branch._id} className="flex items-center">
+            {branchesList.map((branchName, index) => (
+              <div key={index} className="flex items-center">
                 <input
-                type="checkbox"
-                id={branch._id}
-                value={branch.branchName}
-                onChange={(e) => handleBranchSelection(e)}
-                className="mr-2"
+                  type="checkbox"
+                  id={branchName}
+                  value={branchName}
+                  onChange={(e) => handleBranchSelection(e)}
+                  className="mr-2"
                 />
-                <label htmlFor={branch._id} className="text-gray-800">
-                {branch.branchName}
+                <label htmlFor={branchName} className="text-gray-800">
+                  {branchName}
                 </label>
-            </div>
+              </div>
             ))}
         </div>
 

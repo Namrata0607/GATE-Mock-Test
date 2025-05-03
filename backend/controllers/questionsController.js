@@ -3,41 +3,90 @@ const Branch = require('../models/branch');
 const Subject = require('../models/subjects');
 const Question = require('../models/questions');
 
+const processExcelRow = (row) => {
+    const { correctAnswer, queType } = row;
+
+    let processedAnswer;
+    if (queType === "MCQ" || queType === "NAT") {
+        processedAnswer = [correctAnswer]; // Single-element array
+    } else if (queType === "MSQ") {
+        // Ensure correctAnswer is always an array, even if it contains only one value
+        processedAnswer = correctAnswer.includes(",")
+            ? correctAnswer.split(",").map((ans) => ans.trim()) // Split into an array and trim spaces
+            : [correctAnswer.trim()]; // Single value wrapped in an array
+    }
+
+    return processedAnswer;
+};
+
+
 const uploadQuestions = async (req, res, next) => {
     try {
+        console.log("Uploaded File:", req.file); // Log the uploaded file
+        console.log("Request Body:", req.body); // Log the raw request body
+
+        // Validate uploaded file
+        if (!req.file) {
+            return res.status(400).json({ message: "No file uploaded" });
+        }
+
+        // Parse branches
+        let selectedBranchNames = req.body.selectedBranches;
+
+        // Handle both string and JSON array formats
+        if (typeof selectedBranchNames === 'string') {
+            try {
+                if (selectedBranchNames.startsWith('[') && selectedBranchNames.endsWith(']')) {
+                    selectedBranchNames = JSON.parse(selectedBranchNames); // Parse JSON array string
+                } else {
+                    selectedBranchNames = [selectedBranchNames]; // Treat as single branch name
+                }
+            } catch (error) {
+                console.error("Error parsing branches:", error);
+                return res.status(400).json({ message: "Invalid branches format in request body" });
+            }
+        }
+
+        if (!Array.isArray(selectedBranchNames) || selectedBranchNames.length === 0) {
+            console.error("No branches provided:", selectedBranchNames);
+            return res.status(400).json({ message: "No branches provided in the request body" });
+        }
+        console.log("Parsed Branches:", selectedBranchNames);
+
+        // Read the Excel file
         const workbook = XLSX.read(req.file.buffer, { type: 'buffer' });
         const sheet = workbook.Sheets[workbook.SheetNames[0]];
         const data = XLSX.utils.sheet_to_json(sheet);
 
-        let selectedBranchNames = req.body.selectedBranches; // Array: ['CSE', 'AIML', ...]
-        // console.log("Received selectedBranches:", selectedBranchNames);
-
-        if (typeof selectedBranchNames === 'string') {
-            selectedBranchNames = selectedBranchNames.split(',').map(name => name.trim());
+        if (!Array.isArray(data) || data.length === 0) {
+            return res.status(400).json({ message: "The uploaded Excel file is empty or invalid" });
         }
+        console.log("Excel Data:", data);
 
-        // if (!selectedBranchNames || !selectedBranchNames.length) {
-        //     return res.status(400).json({ message: "No branches selected." });
-        // }
+        // Debug: Check the "Computer Networks" subject and its questions
+const subject = await Subject.findOne({ subjectName: "Computer Networks" }).populate('questions');
+if (!subject) {
+    console.error("Subject not found: Computer Networks");
+} else {
+    console.log("Questions for Computer Networks:", subject.questions.length);
+    console.log("Questions:", subject.questions); // Log the actual questions if needed
+}
 
-        // Resolve all selected branch documents
-        let existingBranches  = await Branch.find({ branchName: { $in: selectedBranchNames } });
-        // it will return an array of branch documents that match the selected branch names
-        // $in: operator is used to match any of the specified values in the array.
+        // Fetch or create branches
+        let existingBranches = await Branch.find({ branchName: { $in: selectedBranchNames } });
+        existingBranches = existingBranches || [];
         const existingBranchNames = existingBranches.map(branch => branch.branchName);
 
         const branchesToCreate = selectedBranchNames.filter(name => !existingBranchNames.includes(name));
-
         const newBranches = await Branch.insertMany(
             branchesToCreate.map(name => ({ branchName: name, subjects: [] }))
         );
 
-        // Step 4: Combine all branch docs (existing + new)
         const allBranches = [...existingBranches, ...newBranches];
 
-        for(const row of data){
+        // Process each row in the Excel file
+        for (const row of data) {
             const {
-                // branchName,
                 subjectName,
                 question,
                 queImg,
@@ -49,131 +98,79 @@ const uploadQuestions = async (req, res, next) => {
                 queType,
                 negativeMark,
                 mark
-              } = row;
+            } = row;
 
-              const options = [option1, option2, option3, option4];
+            // Validate required fields
+            if (!subjectName || !question || !queType || !mark) {
+                console.error("Invalid row data:", row);
+                return res.status(400).json({ message: "Invalid data in Excel file. Missing required fields." });
+            }
 
-            // 1.Branch
-            // let branch = await Branch.findOne({ branchName: branchName });
-            // if (!branch) {
-            //     branch = await Branch.create({ branchName: branchName, subjects: [] });
-            // }
+            const options = [option1, option2, option3, option4].filter(opt => opt && opt.trim() !== "");
 
-            // 2.Subject
-            let subject = await Subject.findOne({ subjectName: subjectName});
-            
+            // Process the correctAnswer based on queType
+            const processedAnswer = processExcelRow({ correctAnswer, queType });
+
+            // Subject logic
+            let subject = await Subject.findOne({ subjectName: subjectName });
+
             if (!subject) {
                 subject = await Subject.create({
                     subjectName: subjectName,
                     branches: allBranches.map(b => b._id),
-                    // b => b._id is used to extract the _id property from each branch document in the branchDocs array.
                     questions: []
                 });
+                console.log(`Subject created: ${subjectName}`);
             } else {
                 if (!subject.branches) subject.branches = [];
-                // Add new branches to subject if not already present
                 for (const branch of allBranches) {
                     if (!subject.branches.includes(branch._id)) {
                         subject.branches.push(branch._id);
                     }
                 }
                 await subject.save();
+                console.log(`Subject updated with branches: ${subjectName}, Branch IDs: ${subject.branches}`);
             }
-            // it will check if the subject already exists in the database. If it does not exist, it will create a new subject document with the provided subject name and associate it with the selected branches.
-            // If it does exist, it will check if the branches are already associated with the subject and add them if not.
 
-            // 3.Question
+            // Check if the question already exists
+            const existingQuestion = await Question.findOne({
+                question,
+                queType,
+                subject: subject._id
+            });
+
+            if (existingQuestion) {
+                console.log(`Skipping duplicate question: ${question}`);
+                continue;
+            }
+
+            // Handle queImg: Set to null if blank
+            const image = queImg && queImg.trim() !== "" ? queImg : null;
+
+            // Create the question
             const newQuestion = await Question.create({
                 question,
-                queImg,
+                queImg: image,
                 options,
-                correctAnswer,
+                correctAnswer: processedAnswer,
                 queType,
                 negativeMark: String(negativeMark).toLowerCase() === 'true',
                 mark,
                 subject: subject._id,
             });
+            console.log(`Question created: ${newQuestion._id}, Subject: ${subjectName}`);
 
             subject.questions.push(newQuestion._id);
             await subject.save();
+            console.log(`Question added to subject: ${subjectName}, Question ID: ${newQuestion._id}`);
         }
 
         res.status(200).json({ message: "Questions uploaded successfully!" });
 
-    }catch (error) {
-        next(error);
-        res.status(500).json({ message: "Upload failed" , error: error.message });
+    } catch (error) {
+        console.error("Error in uploadQuestions controller:", error);
+        res.status(500).json({ message: "Upload failed", error: error.message });
     }
 };
 
 module.exports = { uploadQuestions };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// const Question = require("../models/questionPaper");
-
-// // Upload multiple questions to MongoDB
-// const uploadQuestions = async (req, res, next) => {
-//     try {
-//         const questionsData = req.body;
-
-//         if (!Array.isArray(questionsData) || questionsData.length === 0) {
-//             return res.status(400).json({ message: "Invalid input: Expected an array of questions." });
-//         }
-
-//         // Validate each question object
-//         const validQuestions = questionsData.every(q => 
-//             q.question && 
-//             Array.isArray(q.options) && 
-//             Array.isArray(q.correctAnswer) && 
-//             q.queType && 
-//             ["MCQ", "MSQ", "NAT"].includes(q.queType) && 
-//             typeof q.negativeMark === "boolean" && 
-//             typeof q.mark === "number" && 
-//             q.subject
-//         );
-
-//         if (!validQuestions) {
-//             return res.status(400).json({ message: "Invalid question format in request body." });
-//         }
-
-//         // Insert into MongoDB
-//         await Question.insertMany(questionsData);
-
-//         res.status(201).json({ message: "Questions uploaded successfully!" });
-//     } catch (error) {
-//         next(error);
-//     }
-// };
-
-// // Get all questions from MongoDB
-// const getQuestions = async (req, res, next) => {
-//     try {
-//         const questions = await Question.find({});
-//         res.status(200).json({ questions });
-//     } catch (error) {
-//         next(error);
-//     }
-// };
-
-// module.exports = { uploadQuestions, getQuestions };
