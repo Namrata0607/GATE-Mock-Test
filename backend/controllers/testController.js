@@ -257,35 +257,49 @@ const uploadTests = async (req, res, next) => {
   };
 
 const submitUserTest = async (req, res, next) => {
-    try {
-        const { testId, testResponses } = req.body;
-        const userId = req.user.userId;
+  try {
+    const { testId, testResponses } = req.body;
+    const userId = req.user.userId;
 
-        // Prepare the attempted test object
-        const attemptedTest = {
-            testId: testId,
-            testResponses: testResponses.map((response) => ({
-                question: response.question, // Question ID
-                chosenAnswer: response.chosenAnswer, // User's chosen answer(s)
-                obtainedMarks: 0, // Initialize with 0, will be updated after evaluation
-                attemptedStatus: response.attemptedStatus, // Whether the question was attempted
-            })),
-            totalTestMarks: 0, // Marks will be updated later
-            sectionwiseTestMarks: {
-                aptitude: 0,
-                technical: 0,
-            },
-        };
-
-        // Update the user's document
-        await User.findByIdAndUpdate(userId, {
-            $push: { attemptedTests: attemptedTest },
-        });
-
-        res.status(200).json({ message: "Test submitted successfully" });
-    } catch (error) {
-        next(error);
+    if (!testId || !Array.isArray(testResponses) || testResponses.length === 0) {
+      return res.status(400).json({
+        message: "Test cannot be submitted without attempting at least one question.",
+      });
     }
+
+    // Validate each testResponse entry using questionId
+    for (const response of testResponses) {
+      if (!mongoose.Types.ObjectId.isValid(response.questionId)) { // Use questionId
+        return res.status(400).json({
+          message: `Invalid question ID: ${response.questionId}`, // Use questionId in message
+        });
+      }
+    }
+
+    const attemptedTest = {
+      testId, // refer to full test document
+      testResponses: testResponses.map((response) => ({
+        question: response.questionId, // Use questionId for the question reference
+        chosenAnswer: response.chosenAnswer,
+        attemptedStatus: response.attemptedStatus,
+        obtainedMarks: 0, // Placeholder, will be filled after evaluation
+      })),
+      totalTestMarks: 0,
+      sectionwiseTestMarks: {
+        aptitude: 0,
+        technical: 0,
+      },
+    };
+
+    // Push into attemptedTests array
+    await User.findByIdAndUpdate(userId, {
+      $push: { attemptedTests: attemptedTest },
+    });
+
+    return res.status(200).json({ message: "Test submitted successfully" });
+  } catch (error) {
+    next(error);
+  }
 };
 
 module.exports = { getTestQuestions, uploadTests, submitUserTest };

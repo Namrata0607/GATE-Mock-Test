@@ -31,7 +31,7 @@ const uploadQuestions = async (req, res, next) => {
         }
 
         // Parse branches
-        let selectedBranchNames = req.body.selectedBranches;
+        let selectedBranchNames = req.body.branches;
 
         // Handle both string and JSON array formats
         if (typeof selectedBranchNames === 'string') {
@@ -49,7 +49,7 @@ const uploadQuestions = async (req, res, next) => {
 
         if (!Array.isArray(selectedBranchNames) || selectedBranchNames.length === 0) {
             console.error("No branches provided:", selectedBranchNames);
-            return res.status(400).json({ message: "No branches provided in the request body" });
+            return res.status(400).json({ message: "Please select a branch first to upload questions!" });
         }
         console.log("Parsed Branches:", selectedBranchNames);
 
@@ -64,13 +64,13 @@ const uploadQuestions = async (req, res, next) => {
         console.log("Excel Data:", data);
 
         // Debug: Check the "Computer Networks" subject and its questions
-const subject = await Subject.findOne({ subjectName: "Computer Networks" }).populate('questions');
-if (!subject) {
-    console.error("Subject not found: Computer Networks");
-} else {
-    console.log("Questions for Computer Networks:", subject.questions.length);
-    console.log("Questions:", subject.questions); // Log the actual questions if needed
-}
+        const subject = await Subject.findOne({ subjectName: "Computer Networks" }).populate('questions');
+        if (!subject) {
+            console.error("Subject not found: Computer Networks");
+        } else {
+            console.log("Questions for Computer Networks:", subject.questions.length);
+            console.log("Questions:", subject.questions); // Log the actual questions if needed
+        }
 
         // Fetch or create branches
         let existingBranches = await Branch.find({ branchName: { $in: selectedBranchNames } });
