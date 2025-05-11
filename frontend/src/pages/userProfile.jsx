@@ -43,36 +43,47 @@ const handleLogout = async () => {
       };
   
   // Fetch user details
-  useEffect(() => {
-
-    // Fetch user data from API
-    const fetchUserData = async () => {
-      try {
-          const data = await fetchData('http://localhost:3000/api/users/userdetails');
-          console.log('Fetched User Details:', data); // Debug log
-          setUserDetails(data);
-      } catch (err) {
-          console.error('Error fetching user details:', err.message);
-          setError(err.message);
-      }
+  // Fetch user details
+useEffect(() => {
+  const fetchUserData = async () => {
+    try {
+      const data = await fetchData('http://localhost:3000/api/users/userdetails');
+      console.log('Fetched User Details:', data); // Debug log
+      setUserDetails(data);
+    } catch (err) {
+      console.error('Error fetching user details:', err.message);
+      setError(err.message);
+    }
   };
-      
-          fetchUserData();
 
-    // Dummy test history data
-    setTestHistory([
-      { testName: "Test 1", marks: 70, date: "2025-04-01" },
-      { testName: "Test 2", marks: 85, date: "2025-04-15" },
-      { testName: "Test 3", marks: 60, date: "2025-04-30" },
-    ]);
+  fetchUserData();
+  // alert("User details fetched successfully!");
+}, []);
 
-    // Dummy rank details
-    setRankDetails({
-      rank: 5,
-      totalUsers: 50,
-      branch: "Computer Science",
-    });
-  }, []);
+// Process userDetails when it changes
+useEffect(() => {
+  if (userDetails && userDetails.attemptedTests) {
+    const tests = userDetails.attemptedTests.map((test, index) => ({
+      testName: `Test ${index + 1}`,
+      testId: test.testId,// Dummy test ID
+      marks: test.totalTestMarks || 0,
+      date: test.testDate ? new Date(test.testDate).toLocaleDateString() : new Date().toLocaleDateString(), // Human-readable date
+      time: test.testDate ? new Date(test.testDate).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), // Human-readable time
+      // status: test.status || "Completed", // Example additional key
+    }));
+    console.log('Test History:', tests); // Debug log
+    setTestHistory(tests);
+    // alert("Test history fetched successfully!");
+  }
+
+  // Dummy rank details
+  setRankDetails({
+    rank: 5,
+    totalUsers: 50,
+    branch: "Computer Science",
+  });
+}, [userDetails]);
+  
 
   // Line graph data
   const lineGraphData = {
@@ -164,24 +175,34 @@ const handleLogout = async () => {
               <tr>
                 <th className="border-b-2 p-2 text-left">Test Name</th>
                 <th className="border-b-2 p-2 text-left">Date</th>
+                <th className="border-b-2 p-2 text-left">Time</th>
+                {/* <th className="border-b-2 p-2 text-left">Status</th> */}
+                <th className="border-b-2 p-2 text-left">Marks</th>
                 <th className="border-b-2 p-2 text-left">Actions</th>
               </tr>
             </thead>
             <tbody>
-              {testHistory.map((test, index) => (
-                <tr key={index}>
-                  <td className="border-b p-2">{test.testName}</td>
-                  <td className="border-b p-2">{test.date}</td>
-                  <td className="border-b p-2">
-                    <button
-                      onClick={() => navigate(`/test-details/${test.testName}`)}
-                      className="bg-blue-500 text-white px-3 py-1 rounded-lg"
-                    >
-                      View Details
-                    </button>
-                  </td>
-                </tr>
-              ))}
+            {/* Latest test history in reverse order */}
+              {testHistory
+                .slice()
+                .reverse()
+                .map((test, index) => (
+                  <tr key={index}>
+                    <td className="border-b p-2">{test.testName}</td>
+                    <td className="border-b p-2">{test.date}</td>
+                    <td className="border-b p-2">{test.time}</td>
+                    {/* <td className="border-b p-2">{test.status}</td> */}
+                    <td className="border-b p-2">{test.marks}</td>
+                    <td className="border-b p-2">
+                      <button
+                        onClick={() => navigate(`/test-details/${test.testId}`)}
+                        className="bg-blue-500 text-white px-3 py-1 rounded-lg"
+                      >
+                        View Details
+                      </button>
+                    </td>
+                  </tr>
+                ))}
             </tbody>
           </table>
         </div>

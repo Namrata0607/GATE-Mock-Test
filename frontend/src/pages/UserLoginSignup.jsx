@@ -98,7 +98,7 @@ function ULoginSignup() {
               navigate("/userDashboard"); // Redirect to user dashboard
             }
         } else {
-          alert(data.error || "Something went wrong");
+          alert(data.message );
         }
       } catch (error) {
         console.error("Fetch Error:", error);

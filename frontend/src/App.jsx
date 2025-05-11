@@ -19,7 +19,7 @@ import StaffDashboard from "./pages/staffDashboard";
 import StaffProfile from "./pages/staffProfile"; 
 import SetMarks from "./pages/setMarks";
 import UserProfile from "./pages/userProfile";
-
+import TestAnalysis from "./pages/TestAnalysis"; // Import the TestAnalysis component 
 function AppContent() {
   const location = useLocation();
 
@@ -66,6 +66,7 @@ function AppContent() {
         <Route path="/staffProfile" element={<StaffProfile />} />
         <Route path="/set-marks/:branchId" element={<SetMarks />} />
         <Route path="/userProfile" element={<UserProfile />} />
+        <Route path="/test-details/:testId" element={<TestAnalysis/>} />
         {/* Add more routes as needed */}
 
       </Routes>

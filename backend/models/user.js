@@ -33,6 +33,10 @@ const userSchema = new mongoose.Schema({
             },
             testResponses : [
                 {
+                    questionIndex: {
+                        type: Number,
+                        required: true
+                    },
                     question: { 
                         type: mongoose.Schema.Types.ObjectId, 
                         ref: "Questions" 
@@ -58,6 +62,10 @@ const userSchema = new mongoose.Schema({
                     type: Number, 
                     default: 0
                 }
+            },
+            testDate: {
+                type: Date,
+                default: Date.now
             },
         }
     ],  

@@ -109,6 +109,8 @@ const getUserDetails = async (req, res, next) => {
             branchName: user.branch.branchName, // Send branch name
             _id: user._id, // Send user ID
             email: user.email,
+            attemptedTests: user.attemptedTests,
+            mobile: user.mobile,
         });
 
         // console.log(user.branch),
