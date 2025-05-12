@@ -29,6 +29,7 @@ function SetMarks() {
       }
 
       const data = await response.json();
+      console.log("Fetched Subjects:", data); // Debug log
       setSubjects(data.subjects); // Set subjects with current marks
     } catch (error) {
       console.error("Error fetching subjects:", error.message);

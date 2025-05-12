@@ -24,7 +24,7 @@ function AppContent() {
   const location = useLocation();
 
   const hideNavbarAndFooterRoutes = ["/testui"];
-  const userRoutes = ["/userDashboard","/userProfile"]; // update as needed for user access
+  const userRoutes = ["/userDashboard","/userProfile","/test-details/:testId"]; // update as needed for user access
   const staffRoutes = ["/staffLogin","/staffDashboard","/staffProfile","/set-marks/:branchId"]; // for staff access
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);

@@ -39,7 +39,14 @@ const uploadQuestions = async (req, res, next) => {
                 if (selectedBranchNames.startsWith('[') && selectedBranchNames.endsWith(']')) {
                     selectedBranchNames = JSON.parse(selectedBranchNames); // Parse JSON array string
                 } else {
-                    selectedBranchNames = [selectedBranchNames]; // Treat as single branch name
+                    // If it's a string but not a JSON array string, check for commas
+                    if (selectedBranchNames.includes(',')) {
+                        selectedBranchNames = selectedBranchNames.split(',').map(name => name.trim()); 
+                        // Split by comma and trim
+                    } else {
+                        selectedBranchNames = [selectedBranchNames.trim()]; 
+                        // Treat as single branch name and trim
+                    }
                 }
             } catch (error) {
                 console.error("Error parsing branches:", error);
@@ -106,7 +113,7 @@ const uploadQuestions = async (req, res, next) => {
                 return res.status(400).json({ message: "Invalid data in Excel file. Missing required fields." });
             }
 
-            const options = [option1, option2, option3, option4].filter(opt => opt && opt.trim() !== "");
+            const options = [String(option1), String(option2), String(option3), String(option4)].filter(opt => opt && opt.trim() !== "");
 
             // Process the correctAnswer based on queType
             const processedAnswer = processExcelRow({ correctAnswer, queType });

@@ -14,7 +14,7 @@ function StaffNavbar() {
         GATEPREP
       </h1>
       <div>
-        {location.pathname !== "/staffLogin" && (
+        {location.pathname !== "/stafflogin" && (
           <Link to="/staffProfile" className={linkClass}>
             <img src="/Images/profile-staff.png" alt="staff-profile" className="h-10" />
           </Link>

@@ -17,20 +17,43 @@ function TestUI() {
   const [user, setUser] = useState({ name: "", branch: "" });
   const [error, setError] = useState(null);
   const [currentTime, setCurrentTime] = useState(new Date());
+  // const [selectedAnswer, setSelectedAnswer] = useState(null); // This state is no longer needed
   const [isSubmitting, setIsSubmitting] = useState(false);
   const currentQuestions = currentSection === "Aptitude" ? aptitudeQuestions : technicalQuestions;
+  // const [popupData, setPopupData] = useState(null);
+  // const [showPopup, setShowPopup] = useState(false);
 
   // Initialize chosenAnswers by loading from localStorage
   const [chosenAnswers, setChosenAnswers] = useState(() => {
-    const savedAnswers = localStorage.getItem('testResonpses');
+    const savedAnswers = localStorage.getItem('testResponses');
     return savedAnswers ? JSON.parse(savedAnswers) : [];
   });
   const [showTestSummary, setShowTestSummary] = useState(false);
   const [showEvalutionModal, setShowEvalutionModal] = useState(false);
   const [result, setResult] = useState(null);
   const [progressMessage, setProgressMessage] = useState("Loading...");
-
   const navigate = useNavigate();
+
+
+  // function Popup({ data, onClose }) {
+  //   // ... existing Popup component ...
+  //    return (
+  //     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center overflow-y-auto">
+  //       <div className="bg-white p-6 rounded-lg shadow-lg w-3/4 max-w-lg">
+  //         <h2 className="text-xl font-bold mb-4">Test Data</h2>
+  //         <pre className="bg-gray-100 p-4 rounded-lg text-sm overflow-auto">
+  //           {JSON.stringify(data, null, 2)}
+  //         </pre>
+  //         <button
+  //           onClick={onClose}
+  //           className="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+  //         >
+  //           Close
+  //         </button>
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
   // Logic to navigate to the next question
   function goToNextQuestion() {
@@ -98,11 +121,12 @@ function TestUI() {
   // Modified saveAndNext to save the current state to localStorage
   function saveAndNext() {
     // Save the current state of chosenAnswers to localStorage
-    localStorage.setItem("testResonpses", JSON.stringify(chosenAnswers));
+    localStorage.setItem("testReponses", JSON.stringify(chosenAnswers));
     console.log("Updated chosenAnswers in localStorage:", chosenAnswers);
 
     goToNextQuestion();
   }
+
 
   // Submit Test Button Handler - uses chosenAnswers state
   //only saves the test to the database
@@ -143,7 +167,7 @@ async function submitTest(branchId, createdBy) {
     });
 
     // Save updated answers to localStorage
-    localStorage.setItem("testResonpses", JSON.stringify(updatedAnswers));
+    localStorage.setItem("testResponses", JSON.stringify(updatedAnswers));
 
     return updatedAnswers;
   });
@@ -212,11 +236,11 @@ async function submitTest(branchId, createdBy) {
       // alert(result.message);
 
       // Submit the test for the user - pass testId, submitUserTest will use chosenAnswers state
-      // console.log("Test ID:", result.testData.testId); // Log the testId for debugging
+      console.log("Test ID:", result.testData.testId); // Log the testId for debugging
       await submitUserTest(result.testData.testId);
 
       // Clear localStorage after submission
-      localStorage.removeItem("testResonpses");
+      localStorage.removeItem("testResponses");
       localStorage.removeItem("subjectsData");
 
       // alert("Test submitted successfully!");
@@ -232,6 +256,7 @@ async function submitTest(branchId, createdBy) {
   }
 }
 
+  
 
 //User Test Submission - Actual user score will be calculated in backend
  async function submitUserTest(testId) { // Removed testResponses parameter
@@ -245,7 +270,7 @@ async function submitTest(branchId, createdBy) {
 
 
     // Use the current state of chosenAnswers
-    const testResponses = JSON.parse(localStorage.getItem('testResonpses') || '[]');
+    const testResponses = JSON.parse(localStorage.getItem('testResponses') || '[]');
     // console.log("Type of testResponses:", typeof testResponses);
     console.log("testResponses:", testResponses); // Log the testResponses for debugging
     try {
@@ -389,7 +414,6 @@ async function submitTest(branchId, createdBy) {
     fetchTestQuestions();
   }, []);
 
-  // Fetch user details
   useEffect(() => {
     const fetchUserData = async () => {
       try {
@@ -425,7 +449,6 @@ async function submitTest(branchId, createdBy) {
     fetchUserData();
   }, []);
 
-  // Timer logic
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentTime(new Date());
@@ -471,6 +494,7 @@ async function submitTest(branchId, createdBy) {
     const answerEntry = chosenAnswers.find(ans => ans.questionId === currentQuestion._id);
     return answerEntry ? answerEntry.chosenAnswer : null;
   };
+
 
   if (error) return <p>Error: {error}</p>;
   if (!user) return <p>Loading...</p>;
@@ -686,9 +710,11 @@ async function submitTest(branchId, createdBy) {
   );
 }
 
+
+
 export default TestUI;
 
-// TestSummary Component
+
 const TestSummary = ({ onConfirm, onCancel, totalQuestions, attemptedQuestions }) => {
   const attemptedPercentage = Math.round((attemptedQuestions / totalQuestions) * 100);
 
@@ -736,7 +762,8 @@ const TestSummary = ({ onConfirm, onCancel, totalQuestions, attemptedQuestions }
   );
 };
 
-// TestEvaluationModal Component
+
+
 const TestEvaluationModal = ({ progressMessage, result, onClose }) => {
   return (
     <div className="fixed inset-0 bg-black/40 bg-opacity-60 flex justify-center items-center z-50">

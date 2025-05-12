@@ -93,6 +93,7 @@ function ULoginSignup() {
             if (isSignup) {
               alert("Welcome " + data.user.name + " !!! You have successfully signed up.");
               setIsSignup(false);
+              navigate("/uloginsignup"); // Redirect to user login page
             } else {
               alert("Welcome " + data.user.name + " !!! You are now logged in.");
               navigate("/userDashboard"); // Redirect to user dashboard

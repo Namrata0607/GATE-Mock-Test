@@ -120,4 +120,36 @@ const getUserDetails = async (req, res, next) => {
     }
 };
 
-module.exports = { register , login , logout , getUserDetails };
+const editProfile = async (req, res, next) => {
+    try {
+        const { name, email, branch, mobile } = req.body;
+        const user = await User.findById(req.user.userId);
+
+        if (!user) {
+            return res.status(404).json({ 
+                message: "User not found" 
+            });
+        }
+
+        user.name = name;
+        user.email = email;
+        user.branch = branch;
+        user.mobile = mobile;
+
+        await user.save();
+
+        res.json({
+            message: "Profile updated successfully",
+            user: {
+                name: user.name,
+                email: user.email,
+                branch: user.branch,
+                mobile: user.mobile,
+            }
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+module.exports = { register , login , logout , getUserDetails , editProfile };

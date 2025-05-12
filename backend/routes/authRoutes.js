@@ -10,5 +10,6 @@ router.post('/logout', authController.logout);
 
 // Protected route to fetch user details
 router.get('/userdetails', authMiddleware, getUserDetails); 
+router.put('/editprofile', authMiddleware, authController.editProfile); // Protected route to edit user profile
 
 module.exports = router;

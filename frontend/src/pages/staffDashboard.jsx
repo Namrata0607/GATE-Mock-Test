@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 function StaffDashboard() {
   const navigate = useNavigate();
-  const [branches, setBranches] = useState([]); // State to store branches
+  const [availableBranches, setBranches] = useState([]); // State to store branches
   const [selectedBranches, setSelectedBranches] = useState([]); // State for selected branches
   const [file, setFile] = useState(null); // State for the uploaded file
   const [error, setError] = useState(null); // State to handle errors
@@ -27,6 +27,7 @@ function StaffDashboard() {
           throw new Error("Failed to fetch branches");
         }
         const data = await response.json();
+        console.log("Fetched Branches:", data); // Debug log
         setBranches(data); // Set the fetched branches in state
       } catch (err) {
         console.error("Error fetching branches:", err.message);
@@ -58,7 +59,6 @@ function StaffDashboard() {
     console.log("Selected Branches:", selectedBranches);
   }, [selectedBranches]);
 
-
   const handleFileChange = (e) => {
     const uploadedFile = e.target.files[0];
 
@@ -85,7 +85,7 @@ function StaffDashboard() {
 
     const formData = new FormData();
     formData.append("file", file);
-    formData.append("branches", JSON.stringify(selectedBranches)); // Send branches as JSON
+    formData.append("branches", selectedBranches.join(",")); // Send branches as a comma-separated string
 
     // Debugging: Log FormData
     console.log("FormData being sent:");
@@ -127,7 +127,7 @@ function StaffDashboard() {
         Branches available
       </h1>
       <div className="cards-container grid grid-cols-3 gap-10">
-        {branches.map((branch) => (
+        {availableBranches.map((branch) => (
           <div
             key={branch._id}
             className="card border-5 border-blue-100 bg-blue-200 shadow-2xl rounded-xl flex flex-col items-center 
@@ -155,38 +155,38 @@ function StaffDashboard() {
             onChange={handleFileChange}
         />
         {/* Display selected file name */}
-        {file && (
-            <p className="text-gray-600 mt-2">
-                Selected File: <span className="font-semibold">{file.name}</span>
-            </p>
-        )}
+          {file && (
+              <p className="text-gray-600 mt-2">
+            Selected File: <span className="font-semibold">{file.name}</span>
+              </p>
+          )}
 
-        <p className="text-gray-500 mb-4 -mt-2">
-            Upload file in only .xlsx file format!
-        </p>
+          <p className="text-gray-500 mb-4 mt-2">
+              Upload file in only .xlsx file format!
+          </p>
 
-        {/* Checkbox group for branches */}
-        <label className="text-gray-800 font-semibold mb-5 text-xl">
-            Select Branches:
-        </label>
-        <div className="checkbox-group grid grid-cols-2 gap-4 w-full mb-4">
-            {branchesList.map((branchName, index) => (
-              <div key={index} className="flex items-center">
-                <input
-                  type="checkbox"
-                  id={branchName}
-                  value={branchName}
-                  onChange={(e) => handleBranchSelection(e)}
-                  className="mr-2"
-                />
-                <label htmlFor={branchName} className="text-gray-800">
-                  {branchName}
-                </label>
-              </div>
-            ))}
-        </div>
+               { /* Checkbox group for branches */}
+            <label className="text-gray-800 font-semibold mb-5 text-xl">
+                Select Branches:
+            </label>
+            <div className="checkbox-group grid grid-cols-2 gap-4 w-full mb-4">
+                {branchesList.map((branch, index) => (
+            <div key={index} className="flex items-center">
+              <input
+                type="checkbox"
+                id={branch}
+                value={branch}
+                onChange={(e) => handleBranchSelection(e)}
+                className="mr-2"
+              />
+              <label htmlFor={branch} className="text-gray-800">
+                {branch}
+              </label>
+            </div>
+                ))}
+            </div>
 
-        {/* Submit button */}
+            {/* Submit button */}
         <button
             onClick={handleFileUpload}
             className="w-70 text-lg font-semibold font-[sans] bg-white text-gray-800 p-2 rounded transition ease-in-out duration-400 border-3 border-blue-950  hover:bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900 hover:text-white hover:border-blue-900"

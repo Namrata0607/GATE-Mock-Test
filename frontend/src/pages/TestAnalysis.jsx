@@ -50,7 +50,7 @@ export default function TestAnalysis() {
         } else {
           setError(data.message || "Failed to fetch test analysis.");
         }
-      } catch (err) {
+      } catch {
         setError("An error occurred while fetching test analysis.");
       } finally {
         setLoading(false);
