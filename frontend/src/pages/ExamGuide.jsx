@@ -7,7 +7,7 @@ function ExamGuide() {
       title: "What is GATE?",
       description:
       <>
-        <p><b>GATE (Graduate Aptitude Test in Engineering)</b>  is a national-level exam conducted by the IITs and IISc on a rotational basis. It is a computer-based test that evaluates the comprehensive understanding of various undergraduate subjects in engineering and science.</p>
+        <p><b className='text-gray-700'>GATE (Graduate Aptitude Test in Engineering)</b>  is a national-level exam conducted by the IITs and IISc on a rotational basis. It is a computer-based test that evaluates the comprehensive understanding of various undergraduate subjects in engineering and science.</p>
         <br/><p>It is a gateway for candidates to secure admission to postgraduate programs like M.Tech, M.E., Ph.D., etc., in prestigious institutions like IITs, NITs, IIITs, and other universities across India.</p>
       </>
     },
@@ -35,9 +35,9 @@ function ExamGuide() {
       ].map((item, index) => (
         <li key={index} className="flex items-start">
           {!item.isHeader && (
-            <span className="w-3 h-3 bg-gray-800 rounded-full mr-3 mt-2 hover:bg-gray-500"></span>
+            <span className="w-2 h-2 bg-gray-700 rounded-full mr-3 mt-2"></span>
           )}
-          <span className={item.isHeader ? "text-xl font-semibold mt-4" : ""}>
+          <span className={item.isHeader ? "text-gray-700 text-base" : "text-base  text-gray-700"}>
             <strong>{item.label}:</strong> {item.value}
           </span>
         </li>
@@ -58,8 +58,8 @@ function ExamGuide() {
           ]
           .map((item, index) => (
             <li key={index} className="flex items-start">
-            <span className="text-gray-800 font-bold text-lg mr-3">✔</span>
-            <span>
+            <span className="text-gray-700 font-bold text-lg mr-3">✔</span>
+            <span className='text-base text-gray-700'>
                 <strong>{item.label}:</strong><br /> {item.value}
               </span>
             </li>
@@ -78,8 +78,8 @@ function ExamGuide() {
           { label: "Mock Test Reviews", value: "After each test, review answers, learn from explanations, and use performance reports to refine your study plan." }
         ].map((item, index) => (
           <li key={index} className="flex items-start">
-            <span className="text-gray-800 font-bold text-lg mr-3">◆</span>
-            <span>
+            <span className="text-gray-700 font-bold text-base mr-3">◆</span>
+            <span className="text-base text-gray-700">
               <strong>{item.label}:</strong><br /> {item.value}
             </span>
           </li>
@@ -100,8 +100,8 @@ function ExamGuide() {
       { label: "Interactive Explanations", value: "Each mock test provides detailed solutions and explanations to help you learn from mistakes and strengthen your understanding." }
     ].map((item, index) => (
       <li key={index} className="flex items-start">
-            <span className="text-gray-800 font-bold text-lg mr-3">★</span>
-            <span>
+            <span className="text-gray-700 font-bold text-lg mr-3">✔</span>
+            <span className='text-base text-gray-700'>
           <strong>{item.label}:</strong><br /> {item.value}
         </span>
       </li>

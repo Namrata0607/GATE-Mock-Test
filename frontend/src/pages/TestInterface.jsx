@@ -6,6 +6,7 @@ import QuestionStatusButtons from "../components/QuestionStatusButtons";
 import ScientificCalculator from "../components/ScientificCalci";
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
+import Logo from "../components/Logo";
 
 function TestUI() {
   const [showCalculator, setShowCalculator] = useState(false);
@@ -34,26 +35,6 @@ function TestUI() {
   const [progressMessage, setProgressMessage] = useState("Loading...");
   const navigate = useNavigate();
 
-
-  // function Popup({ data, onClose }) {
-  //   // ... existing Popup component ...
-  //    return (
-  //     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center overflow-y-auto">
-  //       <div className="bg-white p-6 rounded-lg shadow-lg w-3/4 max-w-lg">
-  //         <h2 className="text-xl font-bold mb-4">Test Data</h2>
-  //         <pre className="bg-gray-100 p-4 rounded-lg text-sm overflow-auto">
-  //           {JSON.stringify(data, null, 2)}
-  //         </pre>
-  //         <button
-  //           onClick={onClose}
-  //           className="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-  //         >
-  //           Close
-  //         </button>
-  //       </div>
-  //     </div>
-  //   );
-  // }
 
   // Logic to navigate to the next question
   function goToNextQuestion() {
@@ -118,6 +99,26 @@ function TestUI() {
     });
   };
 
+function clearResponse() {
+  const currentQuestion = currentQuestions[selectedQuestion - 1];
+
+  // Remove the current question's answer from chosenAnswers
+  const updatedAnswers = chosenAnswers.map((entry) => {
+    if (entry.questionId === currentQuestion._id) {
+      return {
+        ...entry,
+        chosenAnswer: [],
+        attemptedStatus: false
+      };
+    }
+    return entry;
+  });
+
+  setChosenAnswers(updatedAnswers);
+  localStorage.setItem("testResponses", JSON.stringify(updatedAnswers));
+}
+
+
   // Modified saveAndNext to save the current state to localStorage
   function saveAndNext() {
     // Save the current state of chosenAnswers to localStorage
@@ -171,20 +172,6 @@ async function submitTest(branchId, createdBy) {
 
     return updatedAnswers;
   });
-
-  // Calculate attempted and unattempted questions
-  // const attemptedCount = chosenAnswers.filter((ans) => ans.attemptedStatus).length;
-  // const unattemptedCount = allQuestions.length - attemptedCount;
-
-  // // Show confirmation modal
-  // const confirmSubmit = window.confirm(
-  //   `You have attempted ${attemptedCount} questions and left ${unattemptedCount} unattempted. Do you really want to submit the test?`
-  // );
-
-  // if (!confirmSubmit) {
-  //   setIsSubmitting(false); // Re-enable the button
-  //   return;
-  // }
 
   // Use the updated chosenAnswers state
   const testResponses = chosenAnswers;
@@ -255,7 +242,6 @@ async function submitTest(branchId, createdBy) {
     setIsSubmitting(false); // Re-enable the button
   }
 }
-
   
 
 //User Test Submission - Actual user score will be calculated in backend
@@ -502,14 +488,12 @@ async function submitTest(branchId, createdBy) {
   return (
     <div className="bg-gray-100 min-h-screen flex flex-col items-center">
       <nav className="bg-gray-100 border-b-2 border-gray-200 shadow-2xs-gray flex flex-row justify-between items-center text-gray-800 px-6 h-15 md:h-16 lg:h-16 w-full sticky">
-        <h1 className="font-[Open_Sans] font-bold text-3xl animate-shimmer bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 bg-clip-text text-transparent">
-          GATEPREP
-        </h1>
+        <Logo></Logo>
       </nav>
 
       {/* User Info */}
-      <div className="mt-4 bg-gradient-to-r from-blue-950 via-blue-900 to-blue-950 text-white py-2 px-4 rounded-md shadow-md">
-        <p className="text-lg font-medium">
+      <div className="mx-3 mt-4 bg-gradient-to-r from-blue-950 via-blue-900 to-blue-950 text-white py-2 px-4 rounded-md shadow-md">
+        <p className="lg:text-lg font-medium">
           Candidate: {user.name} | Branch: {user.branchName}
         </p>
       </div>
@@ -526,7 +510,7 @@ async function submitTest(branchId, createdBy) {
       </div>
 
       {/* Main Container */}
-      <div className="flex flex-col lg:flex-row w-9/10 mt-4 h-120 bg-white shadow-lg rounded-lg overflow-hidden">
+      <div className="flex flex-col md:flex-row lg:flex-row w-9/10 mt-4 mb-10 h-200 md:h-140 lg:h-120 bg-white shadow-lg rounded-lg overflow-hidden">
         {/* Left Section */}
         <div className="w-full lg:w-3/4 p-6">
           <SectionTabs
@@ -541,7 +525,7 @@ async function submitTest(branchId, createdBy) {
           )}
 
           {/* Question Display */}
-          <div className="mt-4 p-4 border-2 border-gray-300 rounded-md">
+          <div className="mt-4 p-4 border-2 border-gray-300 rounded-md h-75 lg:h-65">
             <p className="text-lg font-semibold">
               Question no: {selectedQuestion}
             </p>
@@ -615,14 +599,24 @@ async function submitTest(branchId, createdBy) {
           </div>
 
           <div className="flex justify-between items-center mt-6">
-            <button className="flex hover:bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900 border-2 border-blue-900
-             hover:text-white text-gray-800 font-semibold px-6 py-2 rounded hover:bg-white transition duration-300 ease-in-out">
+            <button 
+            onClick={clearResponse}
+            className="mx-2 h-12 w-30 lg:h-10 lg:w-38 
+             flex items-center justify-center
+             text-sm font-semibold text-gray-800 
+             border-2 border-blue-900 rounded 
+             hover:bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900 
+             hover:text-white transition duration-300 ease-in-out">
               Clear Response
             </button>
             <button
-              onClick={() => saveAndNext()} // No need to pass arguments here, saveAndNext uses state
-              className="flex hover:bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900 border-2 border-blue-900
-                        hover:text-white text-gray-800 font-semibold px-6 py-2 rounded hover:bg-white transition duration-300 ease-in-out"
+              onClick={() => saveAndNext()} 
+              className="mx-2 h-12 w-30 lg:h-10 lg:w-38 
+             flex items-center justify-center
+             text-sm font-semibold text-gray-800 
+             border-2 border-blue-900 rounded 
+             hover:bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900 
+             hover:text-white transition duration-300 ease-in-out"
             >
               Save & Next
             </button>
@@ -636,21 +630,18 @@ async function submitTest(branchId, createdBy) {
                 }
               }}
               disabled={isSubmitting} // Disable the button after the first click
-              className={`flex hover:bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900 border-2 border-blue-900
-                          hover:text-white text-gray-800 font-semibold px-6 py-2 rounded hover:bg-white transition duration-300 ease-in-out ${
+              className={`mx-2 h-12 w-30 lg:h-10 lg:w-38 
+             flex items-center justify-center
+             text-sm font-semibold text-gray-800 
+             border-2 border-blue-900 rounded 
+             hover:bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900 
+             hover:text-white transition duration-300 ease-in-out ${
                               isSubmitting ? 'opacity-50 cursor-not-allowed' : ''
                           }`}
           >
               Submit Test
           </button>
-             
-          {/* Popup for displaying data */}
-          {/* {showPopup && (
-            <Popup
-              data={popupData}
-              onClose={() => setShowPopup(false)} // Close the popup
-            />
-          )} */}
+
           </div>
         </div>
 
@@ -658,7 +649,7 @@ async function submitTest(branchId, createdBy) {
         <div className="w-full lg:w-1/4 p-6 bg-gray-100 border-l-2 border-gray-300 overflow-x-auto">
           <h2 className="text-xl font-semibold mb-4">Chosen Section: {currentSection}</h2>
           <p className="text-sm mb-4 text-gray-600">Choose a Question</p>
-          <div className="grid grid-cols-4 gap-2">
+          <div className="grid grid-cols-4 gap-2 md:gap-6 md:pr-2">
             {currentQuestions.map((_, index) => (
               <QuestionStatusButtons
                 key={index}
@@ -670,8 +661,6 @@ async function submitTest(branchId, createdBy) {
           </div>
         </div>
       </div>
-
-
 
 
         {showTestSummary && (
@@ -709,7 +698,6 @@ async function submitTest(branchId, createdBy) {
     </div>
   );
 }
-
 
 
 export default TestUI;

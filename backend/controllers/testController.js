@@ -4,85 +4,6 @@ const Question = require('../models/questions');
 const Tests = require('../models/tests');
 const mongoose = require('mongoose');
 
-// const getTestQuestions = async (req, res, next) => {
-//     try {
-//         // Step 1: Fetch the user's branch
-//         const user = await User.findById(req.user.userId).populate('branch', 'branchName');
-//         if (!user) {
-//             return res.status(404).json({ message: "User not found" });
-//         }
-
-//         const userBranchId = user.branch._id; // Get the branch ObjectId
-
-//         // Step 2: Find all subjects where the user's branch is present in the `branches` array
-//         const subjectsForBranch = await Subject.find({ branches: userBranchId }).populate('questions').select('_id subjectName questions');
-//         if (!subjectsForBranch || subjectsForBranch.length === 0) {
-//             return res.status(404).json({ message: "No subjects found for the user's branch" });
-//         }
-
-//         // Step 3: Separate "Aptitude" subject and branch-specific subjects
-//         const aptitudeSubject = subjectsForBranch.find(subject => subject.subjectName === 'General Aptitude');
-//         const branchSpecificSubjects = subjectsForBranch.filter(subject => subject.subjectName !== 'General Aptitude');
-
-//         // Step 4: Calculate Total Marks
-//         const totalMarks = req.query.totalMarks || 100; // Default to 100 marks
-//         const aptitudeMarks = Math.floor(totalMarks * 0.15); // 15% for aptitude
-//         const branchMarks = totalMarks - aptitudeMarks; // Remaining marks for branch-specific subjects
-
-//         // Step 5: Fetch Aptitude Questions
-//         let aptitudeQuestions = [];
-//         if (aptitudeSubject) {
-//             const allAptitudeQuestions = aptitudeSubject.questions;
-//             aptitudeQuestions = getRandomQuestionsWithMarks(allAptitudeQuestions, 10, aptitudeMarks);
-
-//             if (aptitudeQuestions.reduce((sum, q) => sum + q.mark, 0) < aptitudeMarks) {
-//                 return res.status(400).json({
-//                     message: "Test not generated because there are not enough questions for the Aptitude section.",
-//                 });
-//             }
-//         }
-
-//         // Step 6: Fetch Branch-Specific Questions
-//         const branchSpecificQuestions = [];
-//         const marksPerSubject = Math.floor(branchMarks / branchSpecificSubjects.length); // Divide marks equally among subjects
-
-//         for (const subject of branchSpecificSubjects) {
-//             const allSubjectQuestions = subject.questions;
-
-//             // Fetch questions for the subject based on its allocated marks
-//             const subjectQuestions = getRandomQuestionsWithMarks(allSubjectQuestions, allSubjectQuestions.length, marksPerSubject);
-
-//             if (subjectQuestions.reduce((sum, q) => sum + q.mark, 0) < marksPerSubject) {
-//                 return res.status(400).json({
-//                     message: `Test not generated because there are not enough questions for the ${subject.subjectName} subject.`,
-//                 });
-//             }
-
-//             branchSpecificQuestions.push({
-//                 _id: subject._id,
-//                 subjectName: subject.subjectName,
-//                 questions: subjectQuestions,
-//             });
-//         }
-
-//         // Step 7: Shuffle Questions
-//         aptitudeQuestions = shuffleArray(aptitudeQuestions);
-//         branchSpecificQuestions.forEach(subject => {
-//             subject.questions = shuffleArray(subject.questions);
-//         });
-
-//         // Step 8: Return Separate Sections
-//         res.json({
-//             message: "Questions fetched successfully",
-//             aptitudeQuestions, // Aptitude questions in a separate array
-//             branchSpecificQuestions, // Branch-specific questions in their own array
-//         });
-//     } catch (error) {
-//         next(error);
-//     }
-// };
-
-
 const getTestQuestions = async (req, res, next) => {
   try {
     let aptitudeQuestions = [];
@@ -299,11 +220,11 @@ const submitUserTest = async (req, res, next) => {
     });
 
     return res.status(200).json({ message: "Test submitted successfully" });
+    
   } catch (error) {
     next(error);
   }
 };
-
 
 const evaluateTest = async (req, res, next) => {
   try {
@@ -358,7 +279,6 @@ const evaluateTest = async (req, res, next) => {
     next(error);
   }
 };
-
 
 async function calculateMarks(testResponses) {
   const totalMarks = {
@@ -422,8 +342,6 @@ async function calculateMarks(testResponses) {
     updatedTestResponses: testResponses, // Include updated test responses with obtained marks
   };
 }
-
-
 
 const getTestAnalysis = async (req, res, next) => {
   try {
@@ -501,6 +419,78 @@ const getTestAnalysis = async (req, res, next) => {
   }
 };
 
+const avgMarks = async (req, res, next) => {
+  try {
+    const userId = req.user.userId;
+    const user = await User.findById(userId);
+
+    if (!user || !user.attemptedTests || user.attemptedTests.length === 0) {
+      user.avgMarks = 0;
+      await user.save();
+      return res.status(200).json({ 
+        attemptedTestsCount: 0, 
+        avgMarks: 0 
+      });
+    }
+
+    const totalMarksSum = user.attemptedTests.reduce(
+      (sum, test) => sum + (test.totalTestMarks || 0),
+      0
+    );
+    const attemptedTestsCount = user.attemptedTests.length;
+    const avgMarks = parseFloat((totalMarksSum / attemptedTestsCount).toFixed(2));
+
+    user.avgMarks = avgMarks;
+    await user.save();
+
+    return res.status(200).json({ 
+      attemptedTestsCount, 
+      avgMarks 
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 
 
-module.exports = { getTestQuestions,getTestAnalysis, uploadTests, submitUserTest,evaluateTest };
+const getBranchRank = async (req, res, next) => {
+  try {
+    const userId = req.user.userId;
+
+    const currentUser = await User.findById(userId);
+    if (!currentUser) return res.status(404).json({ message: "User not found" });
+
+    const branch = currentUser.branch;
+
+    const branchUsers = await User.find({ branch, avgMarks: { $gt: 0 } })
+      .select("name avgMarks") // include name and avgMarks only
+      .sort({ avgMarks: -1 }); // sort descending
+
+    // Assign ranks and find current user's rank
+    let userRank = null;
+    const rankedList = branchUsers.map((user, index) => {
+      const rank = index + 1;
+      if (user._id.toString() === userId) userRank = rank;
+      return {
+        name: user.name,
+        avgMarks: user.avgMarks,
+        rank
+      };
+    });
+
+    return res.status(200).json({
+      userRank,
+      rankList: rankedList,
+      currentUser: {
+        name: currentUser.name,
+        avgMarks: currentUser.avgMarks,
+        rank: userRank
+      }
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = { getTestQuestions,getTestAnalysis, uploadTests, 
+                  submitUserTest, evaluateTest, avgMarks , getBranchRank}; 

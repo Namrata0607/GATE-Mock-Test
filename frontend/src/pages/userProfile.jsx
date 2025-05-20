@@ -9,7 +9,8 @@ function UserProfile() {
   const [error, setError] = useState(null);
   const [userDetails, setUserDetails] = useState(null);
   const [testHistory, setTestHistory] = useState([]); 
-  const [rankDetails, setRankDetails] = useState(null); // Dummy rank data
+  const [rankDetails, setRankDetails] = useState(null);
+  const [showRankList, setShowRankList] = useState(false);
   const [isEditing, setIsEditing] = useState(false); // State to manage editing mode
   const [editableUserDetails, setEditableUserDetails] = useState({ // State for editable data
     name: "",
@@ -101,12 +102,34 @@ useEffect(() => {
   }
 
   // Dummy rank details
-  setRankDetails({
-    rank: 5,
-    totalUsers: 50,
-    branch: "Computer Science",
-  });
+  // setRankDetails({
+  //   rank: 5,
+  //   totalUsers: 50,
+  //   branch: "Computer Science",
+  // });
 }, [userDetails]);
+
+useEffect(() => {
+  const token = localStorage.getItem("userToken");
+  const fetchRankDetails = async () => {
+    try {
+      const res = await fetch("http://localhost:3000/api/test/branchRank/", {
+        headers: {
+          Authorization: `Bearer ${token}`, // pass token if required
+        },
+      });
+      const data = await res.json();
+      setRankDetails(data);
+    } catch (error) {
+      console.error("Error fetching rank details:", error);
+    }
+  };
+
+  if (userDetails) {
+    fetchRankDetails();
+  }
+}, [userDetails]);
+
   
  // Handle input changes in the edit form
   const handleInputChange = (e) => {
@@ -190,7 +213,9 @@ useEffect(() => {
         {isEditing ? (
           // Edit Form
           <>
-            <h2 className="text-center text-xl font-bold mb-4">Edit Profile</h2>
+            <h2 className="text-center text-xl font-bold mb-4 font-[sans]">
+              Edit Profile
+            </h2>
             <div className="mb-4">
               <label
                 className="block text-gray-700 text-sm font-bold mb-2"
@@ -281,8 +306,8 @@ useEffect(() => {
             </button>
           </>
         ) : (
-            // Display Profile Details
-            <>
+          // Display Profile Details
+          <>
             <h2 className="text-center text-xl font-bold font-[Sans]">
               Your Profile Details
             </h2>
@@ -291,56 +316,56 @@ useEffect(() => {
               alt="Profile"
               className="h-30 w-30 mx-auto mb-2 mt-5"
             />
-            <h2 className="text-center text-xl font-bold">
+            <h2 className="text-center text-xl font-bold text-gray-800">
               {userDetails.name}
             </h2>
             <div className="flex items-center justify-left text-gray-600 mt-2 ml-5">
               <img
-              src="/Images/icon-email.png"
-              alt="Email"
-              className="h-5 w-5 mr-2"
+                src="/Images/icon-email.png"
+                alt="Email"
+                className="h-5 w-5 mr-2"
               />
               <p>{userDetails.email}</p>
             </div>
             <div className="flex items-center justify-left text-gray-600 mt-2 ml-5">
               <img
-              src="/Images/icon-phone-call.png"
-              alt="Phone"
-              className="h-5 w-5 mr-2"
+                src="/Images/icon-phone-call.png"
+                alt="Phone"
+                className="h-5 w-5 mr-2"
               />
               <p>{userDetails.mobile}</p>
             </div>
             <div className="flex items-center justify-left text-gray-600 mt-2 ml-5">
               <img
-              src="/Images/icon-college.png"
-              alt="Branch"
-              className="h-5 w-5 mr-2"
+                src="/Images/icon-college.png"
+                alt="Branch"
+                className="h-5 w-5 mr-2"
               />
               <p>{userDetails.branchName}</p>
             </div>
             <div className="flex flex-col items-center mt-4">
               <button
-              onClick={handleEditClick}
-              className="mb-4 px-4 py-2 w-60 h-10 text-lg font-semibold font-[sans] text-white text-center rounded
+                onClick={handleEditClick}
+                className="mb-4 px-4 py-2 w-60 h-10 text-lg font-semibold font-[sans] text-white text-center rounded
               transition ease-in-out duration-400 border-3 bg-gradient-to-r
               from-blue-900 via-blue-800 to-blue-900 hover:text-gray-300 border-blue-900 cursor-pointer flex items-center justify-center"
               >
-              Edit Profile
+                Edit Profile
               </button>
               <button
-              onClick={handleLogout}
-              className="px-4 py-2 w-60 h-10 text-lg font-semibold font-[sans] text-white text-center rounded
+                onClick={handleLogout}
+                className="px-4 py-2 w-60 h-10 text-lg font-semibold font-[sans] text-white text-center rounded
               transition ease-in-out duration-400 border-3 bg-gradient-to-r
               from-blue-900 via-blue-800 to-blue-900 hover:text-gray-300 border-blue-900 cursor-pointer flex items-center justify-center"
               >
-              Logout
+                Logout
               </button>
             </div>
-            </>
-          )}
-          </div>
+          </>
+        )}
+      </div>
 
-          {/* Right Section */}
+      {/* Right Section */}
       <div className="w-full lg:w-3/4 flex flex-col gap-5 lg:pl-5">
         {/* Row: Test Performance and Rank Comparison */}
         <div className="flex flex-col lg:flex-row gap-5 ">
@@ -359,24 +384,76 @@ useEffect(() => {
           {/* Rank Comparison Section */}
           <div className="w-full lg:w-1/2 bg-white hover:bg-gray-100 shadow-md rounded-lg p-5">
             <h2 className="mb-4 text-center text-xl font-bold font-[Sans]">
-              Rank Comparison
+              Your Rank
             </h2>
+
             {rankDetails ? (
               <div className="flex flex-col items-center">
-                <p className="text-2xl font-bold">
-                  Rank: {rankDetails.rank} / {rankDetails.totalUsers}
-                </p>
-                <p className="text-gray-600">Branch: {rankDetails.branch}</p>
-                <div className="w-full bg-gray-200 rounded-full h-4 mt-4">
+                {/* Display crown or number */}
+                {rankDetails.userRank <= 3 ? (
+                  <img
+                    src={`/Images/winnerBadge-${rankDetails.userRank}.png`} // crown1.png, crown2.png...
+                    alt={`Rank ${rankDetails.userRank}`}
+                    className="w-35 h-35 mb-2"
+                  />
+                ) : (
+                  <div className="text-3xl font-bold text-blue-600 mb-2">
+                    #{rankDetails.userRank}
+                  </div>
+                )}
+
+                {/* <p className="text-gray-600 mb-2">
+                Branch: {rankDetails.currentUser.branch || "N/A"}
+              </p> */}
+
+                <div className="w-full bg-gray-200 rounded-full h-4 mt-2">
                   <div
                     className="bg-green-500 h-4 rounded-full"
                     style={{
                       width: `${
-                        (rankDetails.rank / rankDetails.totalUsers) * 100
+                        ((rankDetails.rankList.length -
+                          rankDetails.userRank +
+                          1) /
+                          rankDetails.rankList.length) *
+                        100
                       }%`,
                     }}
                   ></div>
                 </div>
+
+                {/* Toggle Button for Rank List */}
+                <button
+                  onClick={() => setShowRankList(!showRankList)}
+                  className="mt-4 px-3 py-1 lg:w-45 text-sm lg:text-lg font-semibold font-[sans] bg-white p-2 
+                        rounded transition ease-in-out duration-400 border-3 bg-gradient-to-r from-blue-900 
+                        via-blue-800 to-blue-900 text-white border-blue-900 cursor:pointer hover:text-gray-300"
+                >
+                  {showRankList ? "Hide Rank List" : "View Rank List"}
+                </button>
+
+                {/* Rank List */}
+                {showRankList && (
+                  <div className="w-full mt-4">
+                    <h3 className="text-center font-semibold mb-2 font-[Sans]">
+                      Rank List
+                    </h3>
+                    <ul className="space-y-1">
+                      {rankDetails.rankList.map((item, index) => (
+                        <li
+                          key={index}
+                          className={`flex justify-between px-4 py-2 rounded ${
+                            item.name === rankDetails.currentUser.name
+                              ? "bg-blue-100 font-bold"
+                              : "bg-gray-100"
+                          }`}
+                        >
+                          <span>{item.name}</span>
+                          <span>Rank {item.rank}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
               </div>
             ) : (
               <p>Loading rank details...</p>
@@ -385,7 +462,7 @@ useEffect(() => {
         </div>
 
         {/* Test History Table */}
-        <div className="bg-white hover:bg-gray-100 shadow-md rounded-lg p-5">
+        <div className="bg-white hover:bg-gray-100 shadow-md rounded-lg p-5 pb-25">
           <h2 className="mb-4 text-center text-xl font-bold font-[Sans]">
             Test History
           </h2>

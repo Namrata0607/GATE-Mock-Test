@@ -69,6 +69,10 @@ const userSchema = new mongoose.Schema({
             },
         }
     ],  
+    avgMarks : {
+        type: Number,
+        default: 0
+    },
     role : {
         type: String,
         enum : ["User","Staff","Admin"],
