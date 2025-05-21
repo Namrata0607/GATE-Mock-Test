@@ -60,19 +60,21 @@ export default function TestAnalysis() {
     fetchAnalysis();
   }, [testId]);
 
+
+
   if (loading) return <div className="text-center text-lg font-semibold">Loading...</div>;
   if (error) return <div className="text-center text-red-500 font-semibold">{error}</div>;
 
   return (
   <div className="p-6 max-w-6xl mx-auto">
   {/* Page Header */}
-  <h1 className="text-4xl font-extrabold mb-8 flex items-center gap-3 text-gray-700">
-    <FaClipboardCheck className="text-gray-500 text-3xl" />
+  <h1 className="text-4xl font-extrabold mb-8 flex items-center gap-3 text-gray-800 justify-center font-[Sans]">
+    {/* <FaClipboardCheck className="text-gray-500 text-3xl" /> */}
     Test Analysis
   </h1>
 
   {/* Summary Card */}
-  <div className="bg-white rounded-2xl shadow-lg p-8 mb-8 border border-gray-100">
+  <div className="bg-gradient-to-r from-blue-50 to-blue-100 rounded-2xl shadow-lg p-8 mb-8 border-l-4 border-blue-600 hover:shadow-xl transition-all duration-300">
     <h2 className="text-2xl font-bold mb-6 flex items-center gap-3 text-green-700">
       <AiOutlineBarChart className="text-green-600 text-2xl" />
       Summary
@@ -85,11 +87,11 @@ export default function TestAnalysis() {
         <span className="font-bold text-gray-800">{analysis.totalMarks}</span>
       </p>
 
-      <p className="flex items-center gap-2">
+      {/* <p className="flex items-center gap-2">
         <FaPercentage className="text-pink-500 text-xl" />
         <span>Percentage:</span>
-        <span className="font-bold text-gray-800">{analysis.additionalCalculations.percentage}%</span>
-      </p>
+        <span className="font-bold text-gray-800">{analysis.additionalCalculations.percentage}</span>
+      </p> */}
 
       <p className="flex items-center gap-2 col-span-2 sm:col-span-1">
         {analysis.additionalCalculations.qualified ? (
@@ -105,32 +107,43 @@ export default function TestAnalysis() {
         )}
       </p>
 
-      <p className="flex items-center gap-2">
+      {/* <p className="flex items-center gap-2">
         <FaChartLine className="text-indigo-500 text-xl" />
         <span>GATE Score Estimate:</span>
         <span className="font-bold text-gray-800">{analysis.additionalCalculations.gateScoreEstimate}</span>
-      </p>
+      </p> */}
+
     </div>
 
     {/* Section-wise Marks */}
         <div className="mt-8">
-          <h3 className="text-lg font-semibold mb-3 flex items-center gap-2 text-gray-700">
-            <FaBook className="text-gray-600 text-xl" />
+          <h3 className="text-xl font-bold mb-4 flex items-center gap-2 text-blue-900">
+            <FaBook className="text-blue-800 text-2xl" />
             Section-wise Marks
           </h3>
-          <ul className="list-disc ml-6 space-y-1 text-base text-gray-800">
+
+          <ul className="space-y-3">
             {Object.entries(analysis.sectionwiseMarks).map(([section, marks]) => (
-              <li key={section}>
-            {section.charAt(0).toUpperCase() + section.slice(1)}: <span className="font-semibold">{marks.toFixed(2)}</span>
+              <li
+                key={section}
+                className="flex justify-between items-center bg-white hover:bg-gray-100 border-l-3 border-blue-600 
+                p-4 rounded shadow hover:scale-[1.02] transition-transform duration-300 w-60"
+              >
+                <span className="text-gray-800 font-medium">
+                  {section.charAt(0).toUpperCase() + section.slice(1)}
+                </span>
+                <span className="text-blue-900 font-bold text-lg">
+                  {marks.toFixed(2)}
+                </span>
               </li>
             ))}
           </ul>
         </div>
-            
 
+      {/* Subject-wise Marks */}      
         <div className="mt-8">
-              <h3 className="text-lg font-semibold mb-3 flex items-center gap-2 text-gray-700">
-            <FaClipboardList className="text-gray-600 text-xl" />
+          <h3 className="text-xl font-bold mb-4 flex items-center gap-2 text-blue-900">
+            <FaBook className="text-blue-800 text-2xl" />
             Subject-wise Marks
               </h3>
               <ul className="list-disc ml-6 space-y-1 text-base text-gray-800">
@@ -157,11 +170,11 @@ export default function TestAnalysis() {
           </div>
           
           {/* Detailed Analysis */}
-      <div>
-        <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2">
-          <FaClipboardList  className="text-purple-600" />
-          Detailed Analysis
-        </h2>
+         <div>
+            <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2 font-[Sans] text-gray-800">
+              <FaClipboardList  className="text-blue-800" />
+              Detailed Analysis
+            </h2>
 
             {analysis.detailedAnalysis.map((question, index) => {
                 const optionLabels = ["A", "B", "C", "D", "E", "F"];
@@ -182,11 +195,11 @@ export default function TestAnalysis() {
                     {/* Header: Question + Marks + Subject */}
                     <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4">
                         <h3 className="text-lg md:text-xl font-semibold text-gray-800">
-                        <span className="text-blue-600 font-bold mr-2">Q{question.questionIndex}:</span>
+                        <span className="text-blue-700 font-bold mr-2">Q{question.questionIndex}:</span>
                         {question.questionText}
                         </h3>
                         <div className="mt-2 md:mt-0 flex items-center gap-4 text-sm md:text-base">
-                        <span className="bg-blue-50 text-blue-600 font-semibold px-3 py-1 text-sm rounded-full border border-blue-200">
+                        <span className="bg-blue-50 text-blue-700 font-semibold px-3 py-1 text-sm rounded-full border border-blue-200">
                         {question.subject}
                         </span>
                         <span className="bg-green-50 text-green-700 font-semibold px-3 py-1 rounded-full border text-sm border-green-200">
@@ -205,12 +218,12 @@ export default function TestAnalysis() {
                     )}
 
 
-{/* correct for value as answer */}
+              {/* correct for value as answer */}
                     {/* Options or Direct Answer */}
             {hasOptions && question.options.some(option => option !== null) && (
                 <div className="mb-4">
                     <h4 className="text-sm font-semibold text-gray-600 mb-2">Options:</h4>
-                        {question.correctAnswer}
+                        {/* {question.correctAnswer} */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {question.options.map((option, idx) => {
                         const normalizedOption = option?.toString().trim().toLowerCase();
@@ -236,40 +249,8 @@ export default function TestAnalysis() {
                     })}
                     </div>
                 </div>
-                )}
+            )}
 
-
-                {/* correct for a, b, c, d answers  */}
-            {/* {hasOptions && question.options.some(option => option !== null) && (
-              <div className="mb-4">
-                    <h4 className="text-sm font-semibold text-gray-600 mb-2">Options:</h4>
-                  {question.correctAnswer}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    {question.options.map((option, idx) => {
-                            const optionLabel = optionLabels[idx]?.toLowerCase(); // "a", "b", "c", etc.
-                    const isCorrect = question.correctAnswer.map(ans => ans.toLowerCase()).includes(optionLabel);
-
-                        return (
-                        <div
-                            key={idx}
-                            className={`border rounded-md px-3 py-2 text-sm flex items-start gap-2 ${
-                            isCorrect
-                                ? "bg-green-50 border-green-500 text-green-800 font-medium"
-                                : "bg-gray-50 border-gray-300 text-gray-800"
-                            }`}
-                        >
-                            <span className="font-bold">
-                            {optionLabels[idx] || String.fromCharCode(65 + idx)}.
-                            </span>
-                            <span>{option ?? "N/A"}</span>
-                        </div>
-                        );
-                    })}
-                    </div>
-                </div>
-                )} */}
-
-                
 
                 {(!hasOptions || question.options.every(opt => !opt || opt === "N/A")) && (
                 <div className="mb-4 flex items-center gap-2 text-xl"> 
@@ -317,7 +298,7 @@ export default function TestAnalysis() {
                     {/* Badge at bottom right */}
                     <div className="absolute bottom-3 right-4 text-xs text-gray-500 italic group-hover:text-gray-700 transition-all">
                         <FaQuestionCircle className="inline mr-1 text-blue-400" />
-                        Question #{question.questionIndex}
+                        Question {question.questionIndex}
                     </div>
                     </div>
                 );

@@ -9,7 +9,7 @@ function ProfileNavbar(){
 
     const location = useLocation();
 
-    const linkClass = "font-bold text-xl m-10 transition duration-100 px-4 py-1";
+    const linkClass = "font-bold text-xl mx-4 transition duration-100";
 
     const [user, setUser] = useState({ name: ''});
     const [error, setError] = useState(null);
@@ -34,8 +34,8 @@ function ProfileNavbar(){
 return (
   <nav className="bg-gray-100 border-b-2 border-gray-200 shadow-2xs-gray h-15 md:h-16 lg:h-16 w-full flex justify-between items-center text-gray-800 p-5 pr-0">
     <Logo></Logo>
-    <div className="flex items-center ml-auto -mr-10 -space-x-12">
-      <h1 className="font-[Open_Sans] font-bold text-lg md:text-xl lg:text-2xl text-right">
+    <div className="flex items-center ml-auto -space-x-2"> 
+      <h1 className="hidden sm:block font-[Open_Sans] font-bold md:text-xl lg:text-2xl text-right">
         Welcome {user.name} !
       </h1>
       {location.pathname !== "/staffLogin" && (
@@ -43,7 +43,7 @@ return (
           <img
             src="/Images/profile-staff.png"
             alt="staff-profile"
-            className="h-10"
+            className="h-10 w-10"
           />
         </Link>
       )}

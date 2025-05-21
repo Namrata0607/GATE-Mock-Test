@@ -7,7 +7,7 @@ function Footer() {
         
         {/* Left Side - Platform Info */}
         <div className="text-center md:text-left mb-4 md:mb-0">
-          <h2 className="text-xl font-bold">GATEPrep</h2>
+          <h2 className="text-xl font-bold">GATEPREP</h2>
           <p className="text-sm opacity-80">© 2025 All rights reserved.</p>
         </div>
 

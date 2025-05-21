@@ -17,7 +17,7 @@ function Instructions() {
   const buttons = [
     { text: "1", color: "bg-gray-200 border-gray-400 text-black rounded-md", info: "You have NOT visited the question yet." },
     { text: "2", color: "bg-red-500 border-red-700 text-white rounded-b-lg rounded-t-none", info: "You have NOT answered the question yet." },
-    { text: "3", color: "bg-green-500 border-green-700 text-white rounded-t-lg rounded-b-none h-10 w-17 ", info: "You have answered the question.This will be evaluated." },
+    { text: "3", color: "bg-green-500 border-green-700 text-white rounded-t-lg rounded-b-none h-10 w-17", info: "You have answered the question.This will be evaluated." },
     { text: "4", color: "bg-purple-500 border-purple-700 text-white rounded-full h-10 w-22", info: "You have NOT answered the question but marked it for review." },
     { text: "5", color: "bg-purple-500 border-purple-700 text-white rounded-full h-10 w-28 md:w-12 relative", info: "You have answered the question and marked it for review.This will also be evaluated." },
   ];

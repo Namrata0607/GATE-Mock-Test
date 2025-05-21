@@ -19,6 +19,7 @@ function UserProfile() {
     mobile: "", // Add mobile to state
   });
   const [availableBranches, setAvailableBranches] = useState([]); // State to store branches for dropdown
+  const [avgMarksData, setAvgMarksData] = useState(null); // holds avgMarks + attemptedTests
   const navigate = useNavigate();
 
 const handleLogout = async () => {
@@ -202,13 +203,39 @@ useEffect(() => {
     ],
   };
 
+  useEffect(() => {
+    const fetchAvgMarks = async () => {
+      try {
+        const token = localStorage.getItem("userToken");
+        const response = await fetch("http://localhost:3000/api/test/avgMarks/", {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`, // Include the token
+            "Content-Type": "application/json",
+          },
+        });
+        const data = await response.json();
+        if (response.ok) {  
+          setAvgMarksData(data);
+        } else {
+          setError("Failed to fetch avgMarks: " + data.message);
+        }
+      } catch (err) {
+        console.error("Failed to fetch avgMarks:", err);
+        setError("Error loading test data");
+      }
+    };
+
+    fetchAvgMarks();
+  }, []);
+
   if (error) return <p>Error: {error}</p>;
   if (!userDetails) return <p>Loading...</p>;
 
   return (
     <div className="flex flex-col lg:flex-row h-full w-full p-5 bg-gray-100">
       {/* Left Section: User Profile */}
-      <div className="lg:h-screen h-full w-full lg:w-1/4 bg-white hover:bg-gray-100 shadow-md rounded-lg p-5 mb-5">
+      <div className="lg:h-150 h-full w-full lg:w-1/4 bg-white hover:bg-gray-100 shadow-md rounded-lg p-5 mb-5">
         {/* Conditionally render based on isEditing state */}
         {isEditing ? (
           // Edit Form
@@ -367,6 +394,7 @@ useEffect(() => {
 
       {/* Right Section */}
       <div className="w-full lg:w-3/4 flex flex-col gap-5 lg:pl-5">
+
         {/* Row: Test Performance and Rank Comparison */}
         <div className="flex flex-col lg:flex-row gap-5 ">
           {/* Test Performance Section */}
@@ -374,11 +402,25 @@ useEffect(() => {
             <h2 className="mb-4 text-center text-xl font-bold font-[Sans]">
               Test Performance
             </h2>
-            <div className="h-64 w-full">
-              {" "}
-              {/* Adjusted height to make the graph larger */}
+            <div className="h-75 w-full">
+              {/* Graph */}
               <Line data={lineGraphData} />
+
+              {/* Avg Marks Info */}
+              <div className="mt-5 flex flex-col items-center text-base font-bold text-gray-800 bg-blue-100 py-2 rounded">
+                {error ? (
+                  <p className="text-red-500">{error}Failed to fetch avg marks...</p>
+                ) : avgMarksData ? (
+                  <div  className="flex flex-row justify-between gap-20 items-center">
+                    <p>Total Attempted Tests: <span className="text-gray-800 font-bold">{avgMarksData.attemptedTestsCount}</span></p>
+                    <p>Average Marks: <span className="text-gray-800 font-bold">{avgMarksData.avgMarks}</span></p>
+                  </div>
+                ) : (
+                  <p>Loading avg marks...</p>
+                )}
+              </div>
             </div>
+
           </div>
 
           {/* Rank Comparison Section */}
@@ -398,7 +440,7 @@ useEffect(() => {
                   />
                 ) : (
                   <div className="text-3xl font-bold text-blue-600 mb-2">
-                    #{rankDetails.userRank}
+                    {rankDetails.userRank}
                   </div>
                 )}
 
