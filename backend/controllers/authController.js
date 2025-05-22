@@ -111,6 +111,7 @@ const getUserDetails = async (req, res, next) => {
             email: user.email,
             attemptedTests: user.attemptedTests,
             mobile: user.mobile,
+            avgMarks: user.avgMarks,
         });
 
         // console.log(user.branch),
@@ -152,4 +153,21 @@ const editProfile = async (req, res, next) => {
     }
 };
 
-module.exports = { register , login , logout , getUserDetails , editProfile };
+const getUsersByBranch = async (req, res, next) => {
+    try {
+        const { branch } = req.params;
+        const users = await User.find({ branch: branchId }).select("name avgMarks attemptedTests");
+        // Map users to include attemptedTestsCount
+        const usersWithAttemptedTestsCount = users.map(user => ({
+            name: user.name,
+            avgMarks: user.avgMarks,
+            attemptedTestsCount: user.attemptedTests ? user.attemptedTests.length : 0
+        }));
+        res.json({ users: usersWithAttemptedTestsCount });
+
+    } catch (error) {
+        next(error);
+    }
+};
+
+module.exports = { register , login , logout , getUserDetails , editProfile, getUsersByBranch };

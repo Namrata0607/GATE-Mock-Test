@@ -163,17 +163,41 @@ const updateMarks = async (req, res, next) => {
     }
 };
 
-const fetchUploadedFiles = async (req, res, next) => {
+const editStaffProfile = async (req, res, next) => {
     try {
-      const staff = await Staff.findById(req.staff.staffId);
-      if (!staff) {
-        return res.status(404).json({ message: "Staff not found" });
-      }
-      res.status(200).json(staff.uploadedFiles);
+        const { name, email } = req.body;
+        const staffId = req.staff.staffId;
+
+        // Find the staff member by ID
+        const staff = await Staff.findById(staffId);
+        if (!staff) {
+            return res.status(404).json({ message: "Staff not found" });
+        }
+
+        // Update the staff member's details
+        staff.name = name || staff.name;
+        staff.email = email || staff.email;
+
+        await staff.save();
+
+        res.status(200).json({ message: "Profile updated successfully", staff });
     } catch (error) {
-        res.status(500).json({ message: "Error fetching uploaded files", error });
+        console.error("Error updating profile:", error.message);
+        res.status(500).json({ message: "Internal Server Error", error: error.message });
     }
 }
 
+// const fetchUploadedFiles = async (req, res, next) => {
+//     try {
+//       const staff = await Staff.findById(req.staff.staffId);
+//       if (!staff) {
+//         return res.status(404).json({ message: "Staff not found" });
+//       }
+//       res.status(200).json(staff.uploadedFiles);
+//     } catch (error) {
+//         res.status(500).json({ message: "Error fetching uploaded files", error });
+//     }
+// }
+
 module.exports = { staffSignup, staffLogin, staffLogout, getStaffDetails, 
-                  getSubjectsByBranch, updateMarks, fetchUploadedFiles };
+                  getSubjectsByBranch, updateMarks, editStaffProfile };

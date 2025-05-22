@@ -341,7 +341,6 @@ async function submitTest(branchId, createdBy) {
   }
 }
   
-
 //User Test Submission - Actual user score will be calculated in backend
  async function submitUserTest(testId) { // Removed testResponses parameter
     const token = localStorage.getItem('userToken');

@@ -13,8 +13,8 @@ router.post('/staffLogout',staffAuthMiddleware, staffController.staffLogout);
 router.get('/getSubjectsByBranch/:branch', staffAuthMiddleware, staffController.getSubjectsByBranch);
 router.post('/setMarks/:branchId', staffAuthMiddleware, staffController.updateMarks);
 router.get('/getStaffDetails', staffAuthMiddleware, staffController.getStaffDetails);
-router.get('/getUploadedFiles', staffAuthMiddleware, staffController.fetchUploadedFiles);
-
+// router.get('/getUploadedFiles', staffAuthMiddleware, staffController.fetchUploadedFiles);
+router.put('/editStaffProfile', staffAuthMiddleware, staffController.editStaffProfile); // Protected route to edit user profile
 
 router.post('/upload-questions', staffAuthMiddleware, fileUploadMiddleware.single('file'), uploadQuestions);// .single('file') is used to handle single file uploads
 // 'file' is the name of the file input field in the form

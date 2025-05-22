@@ -124,7 +124,7 @@ function StaffDashboard() {
   return (
     <div className="dashboard-container items-center flex flex-col h-full w-full mb-20">
       <h1 className="text-gray-800 font-bold text-3xl text-center m-10 font-[sans]">
-        Branches available
+        Available Branches
       </h1>
       <div className="cards-container grid grid-cols-3 gap-10">
         {availableBranches.map((branch) => (

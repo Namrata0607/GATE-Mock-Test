@@ -6,6 +6,41 @@ function SetMarks() {
   const [subjects, setSubjects] = useState([]); // State to store subjects
   const [marks, setMarks] = useState({}); // State to store updated marks for each subject
 
+  // const [students, setStudents] = useState([]);
+
+  
+// const fetchStudents = useCallback(async () => {
+//   try {
+//     const token = localStorage.getItem("staffToken");
+//     const response = await fetch(
+//       `http://localhost:3000/api/users/getUsersByBranch/${branchId}`,
+//       {
+//         method: "GET",
+//         headers: {
+//           "Content-Type": "application/json",
+//           Authorization: `Bearer ${token}`,
+//         },
+//       }
+//     );
+//     console.log("Calling fetchStudents for branch:", branchId);
+//     // console.log("Status Code:", response.status);
+//     // console.log("Response:", response);
+
+//     if (!response.ok) {
+//       // const errorText = await response.text();
+//       // console.error("Error response text:", errorText);
+//       throw new Error("Failed to fetch students");
+//     }
+
+//     const data = await response.json();
+//     setStudents(data.users); // data.users contains name and avgMarks
+//     console.log("Students data:", data.users); // Should be a non-empty array
+
+//   } catch (error) {
+//     console.error("Error fetching students:", error.message);
+//   }
+// }, [branchId]);
+
   const fetchSubjects = useCallback(async () => {
     try {
       console.log("Fetching subjects..."); // Debug log
@@ -38,6 +73,7 @@ function SetMarks() {
 
   useEffect(() => {
     fetchSubjects(); // Call fetchSubjects to fetch data on component mount
+    // fetchStudents(); // also fetch students
   }, [fetchSubjects]); // Add fetchSubjects to the dependency array
 
   const handleMarksChange = (subjectId, value) => {
@@ -45,6 +81,7 @@ function SetMarks() {
     setMarks({ ...marks, [subjectId]: value }); // Update marks for the subject
   };
 
+  // Function to handle setting marks
   const handleSetMarks = async (branchId, marks) => {
     try {
       console.log("Branch ID:", branchId); // Debug log
@@ -83,7 +120,7 @@ function SetMarks() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-6">
-      <h1 className="text-3xl font-bold text-gray-800 mb-6">
+      <h1 className="text-3xl font-bold text-gray-800 mb-6 font-[Sans]">
         Set Marks for {branchId} Branch
       </h1>
       <form
@@ -149,6 +186,40 @@ function SetMarks() {
           </button>
         </div>
       </form>
+
+      {/*  */}
+     {/* <div className="mt-10 w-full max-w-4xl">
+        <h2 className="text-2xl font-semibold text-gray-700 mb-4">
+          Students in {branchId} Branch
+        </h2>
+        <table className="table-auto w-full border-collapse border border-gray-300">
+          <thead>
+            <tr className="bg-gray-100">
+              <th className="border border-gray-300 px-4 py-2 text-left">Name</th>
+              <th className="border border-gray-300 px-4 py-2 text-left">Average Marks</th>
+            </tr>
+          </thead>
+          <tbody>
+            {students.length > 0 ? (
+              students.map((student) => (
+                <tr key={student.name} className="hover:bg-gray-50">
+                  <td className="border border-gray-300 px-4 py-2">{student.name}</td>
+                  <td className="border border-gray-300 px-4 py-2">
+                    {student.avgMarks !== undefined ? student.avgMarks : "N/A"}
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="2" className="text-center py-4 text-gray-500">
+                  No students found for this branch.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div> */}
+
     </div>
   );
 }

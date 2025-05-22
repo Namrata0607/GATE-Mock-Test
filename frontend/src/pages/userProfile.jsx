@@ -300,7 +300,7 @@ useEffect(() => {
               >
                 Branch:
               </label>
-              {/* Use a select dropdown for branches */}
+              Use a select dropdown for branches
               <select
                 id="branch"
                 name="branch" // Name should match the backend expectation (branch ID)
@@ -338,11 +338,9 @@ useEffect(() => {
             <h2 className="text-center text-xl font-bold font-[Sans]">
               Your Profile Details
             </h2>
-            <img
-              src="/Images/square-profile.png"
-              alt="Profile"
-              className="h-30 w-30 mx-auto mb-2 mt-5"
-            />
+            <div className="ml-30 md:ml-75 lg:ml-30 mt-8 mb-6 w-24 h-24 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 text-4xl font-semibold">
+              {userDetails.name?.charAt(0).toUpperCase()}
+            </div>
             <h2 className="text-center text-xl font-bold text-gray-800">
               {userDetails.name}
             </h2>

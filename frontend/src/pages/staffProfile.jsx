@@ -1,156 +1,242 @@
-  import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 
-  function StaffProfile() {
+function StaffProfile() {
+  const [staffDetails, setStaffDetails] = useState(null);
+  const [error, setError] = useState(null);
+  const [editMode, setEditMode] = useState(false);
+  const [editForm, setEditForm] = useState({ name: "", email: "" });
+  const [loading, setLoading] = useState(false);
 
-    const [uploadedFiles, setUploadedFiles] = useState([]);
-    const [staffDetails, setStaffDetails] = useState(null);
-    const [error, setError] = useState(null);
-
-    useEffect(() => {
-      const fetchUploadedFiles = async () => {
-        try {
-          const token = localStorage.getItem("staffToken");
-          if (!token) {
-            throw new Error("No token found. Please log in again.");
-          }
-
-          const response = await fetch("http://localhost:3000/api/staff/getUploadedFiles", {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          });
-
-          if (!response.ok) {
-            throw new Error("Failed to fetch uploaded files");
-          }
-
-          const data = await response.json();
-          setUploadedFiles(data); // Set the uploaded files in state
-        } catch (err) {
-          setError(err.message);
-        }
-      };
-
-      fetchUploadedFiles();
-    }, []);
-
-    useEffect(() => {
-      const fetchStaffDetails = async () => {
-        try {
-          const token = localStorage.getItem("staffToken"); // Retrieve token from localStorage 
-          console.log("Staff Token:", token); // Debug log
-
-          if (!token) {
-            throw new Error("No token found. Please log in again.");
-          }
-
-          const response = await fetch("http://localhost:3000/api/staff/getStaffDetails", {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`, // Include token in Authorization header
-            },
-          });
-
-          if (!response.ok) {
-            throw new Error("Failed to fetch staff details");
-          }
-
-          const data = await response.json();
-          setStaffDetails(data); // Set staff details in state
-        } catch (err) {
-          setError(err.message);
-        }
-      };
-
-      fetchStaffDetails();
-    }, []);
-
-    const handleLogout = async () => {
+  useEffect(() => {
+    const fetchStaffDetails = async () => {
       try {
-        const token = localStorage.getItem("staffToken"); // Retrieve token from localStorage
+        const token = localStorage.getItem("staffToken");
         if (!token) {
           throw new Error("No token found. Please log in again.");
         }
 
-        const response = await fetch("http://localhost:3000/api/staff/staffLogout", {
-          method: "POST", 
+        const response = await fetch("http://localhost:3000/api/staff/getStaffDetails", {
+          method: "GET",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`, // Include token in Authorization header
+            Authorization: `Bearer ${token}`,
           },
-          credentials: "include", // Ensure cookies are included
         });
-        
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch staff details");
+        }
+
         const data = await response.json();
+        setStaffDetails(data);
+        setEditForm({ name: data.name, email: data.email });
+      } catch (err) {
+        setError(err.message);
+      }
+    };
 
-        if (response.ok) {
-          alert(data.message);
+    fetchStaffDetails();
+  }, []);
 
-          const role = localStorage.getItem("userToken") ? "user" : "staff";
-              if (role === "user") {
-                localStorage.removeItem("userToken");
-                localStorage.removeItem("userName");
-              } else if (role === "staff") {
-                localStorage.removeItem("staffToken");
-                localStorage.removeItem("staffName");
-              }
-              window.location.href = "/staffLogin"; // Redirect to login page
-            } else {
-              alert("Logout failed: " + data.message);
-            }
-          } catch (error) {
-            console.error("Logout error:", error);
-          }
-      };
+  const handleLogout = async () => {
+    try {
+      const token = localStorage.getItem("staffToken");
+      if (!token) {
+        throw new Error("No token found. Please log in again.");
+      }
 
-    
-    if (error) {
-      return <div className="text-red-500">Error: {error}</div>;
+      const response = await fetch("http://localhost:3000/api/staff/staffLogout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        credentials: "include",
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        alert(data.message);
+
+        const role = localStorage.getItem("userToken") ? "user" : "staff";
+        if (role === "user") {
+          localStorage.removeItem("userToken");
+          localStorage.removeItem("userName");
+        } else if (role === "staff") {
+          localStorage.removeItem("staffToken");
+          localStorage.removeItem("staffName");
+        }
+        window.location.href = "/staffLogin";
+      } else {
+        alert("Logout failed: " + data.message);
+      }
+    } catch (error) {
+      console.error("Logout error:", error);
     }
+  };
 
-    if (!staffDetails) {
-      return <div>Loading...</div>;
+  const handleEditToggle = () => {
+    setEditMode((prev) => !prev);
+    setEditForm({ name: staffDetails.name, email: staffDetails.email });
+  };
+
+  const handleInputChange = (e) => {
+    setEditForm({ ...editForm, [e.target.name]: e.target.value });
+  };
+
+  const handleEditSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const token = localStorage.getItem("staffToken");
+      if (!token) {
+        throw new Error("No token found. Please log in again.");
+      }
+
+      const response = await fetch("http://localhost:3000/api/staff/editStaffProfile", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(editForm),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setStaffDetails(data);
+        setEditMode(false);
+        alert("Profile updated successfully!");
+      } else {
+        alert("Update failed: " + data.message);
+      }
+    } catch (err) {
+      alert("Error: " + err.message);
     }
+    setLoading(false);
+  };
 
-    return (
-      <div className="dashboard-container">
-        {/* <h1>Staff Profile</h1> */}
-          <div className="flex flex-row items-center justify-center h-screen">   
-              <div className="m-2 w-1/4 border-2 h-120 justify-left rounded-lg p-4">
-                  <h1 className="text-4xl font-bold mb-4">Staff Profile</h1>
-                      <h2 className="text-2xl font-semibold mb-4">Profile Details</h2>
-                      <p><strong>Name:</strong> {staffDetails.name}</p>
-                      <p><strong>Email:</strong> {staffDetails.email}</p>
-                      <button onClick={handleLogout}
-                      className="relative border-2 border-blue-950 h-8 w-28 rounded-sm bg-white bg-border-blue-950 hover:bg-gradient-to-r from-blue-950 via-blue-900 to-blue-950 hover:text-white 
-                      font-[Sans] font-semibold md:text-lg md:w-30 md:h-9 lg:h-10 lg:w-32 ease-in-out duration-400"
-                      >
-                        Logout
-                      </button>
-              </div>
-              <div className="flex flex-row justify-center items-center border-2 rounded-lg h-120 w-1/4">
-                  <div className="mb-6">
-                  <h2 className="text-2xl font-semibold">Uploaded Files</h2>
-                  {uploadedFiles.length === 0 ? (
-                    <p>No files uploaded yet.</p>
-                  ) : (
-                    <ul>
-                      {uploadedFiles.map((file, index) => (
-                        <li key={index} className="mb-2">
-                          <strong>File:</strong> {file.fileName} <br />
-                          <strong>Uploaded On:</strong> {new Date(file.uploadedAt).toLocaleDateString()} <br />
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
-              </div>
-          </div>
-      </div>
-    );
+  if (error) {
+    return <div className="text-red-500 text-center mt-10">Error: {error}</div>;
   }
 
-  export default StaffProfile;
+  if (!staffDetails) {
+    return <div className="text-gray-600 text-center mt-10">Loading...</div>;
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+      <div className="bg-white shadow-lg rounded-xl w-full max-w-4xl flex flex-col md:flex-row p-6 gap-6">
+        {/* Profile Info */}
+        <div className="w-full md:w-1/2">
+          <div className="flex items-center justify-between mb-6">
+            <h1 className="text-3xl font-bold text-gray-800 font-[Sans]">Staff Profile</h1>
+          </div>
+          <div className="space-y-4 text-gray-700">
+            {editMode ? (
+              <form onSubmit={handleEditSubmit} className="space-y-4">
+                <div>
+                  <label className="text-sm text-gray-500 block mb-1" htmlFor="name">
+                    Full Name
+                  </label>
+                  <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    value={editForm.name}
+                    onChange={handleInputChange}
+                    className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="text-sm text-gray-500 block mb-1" htmlFor="email">
+                    Email
+                  </label>
+                  <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    value={editForm.email}
+                    onChange={handleInputChange}
+                    className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                    required
+                  />
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="px-3 py-1 lg:w-25 text-sm lg:text-lg font-semibold font-[sans] bg-white p-2 
+                        rounded transition ease-in-out duration-400 border-3 bg-gradient-to-r from-blue-900 
+                        via-blue-800 to-blue-900 text-white border-blue-900 cursor:pointer hover:text-gray-300"
+                  >
+                    {loading ? "Saving..." : "Save"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleEditToggle}
+                    className="px-4 py-2 w-25 text-lg font-semibold font-[sans] bg-white text-gray-800 rounded
+              transition ease-in-out duration-400 border-3 border-gray-500  hover:bg-gray-200 hover:text-gray-800 cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            ) : (
+              <>
+                <div>
+                  <p className="text-sm text-gray-500">Full Name</p>
+                  <p className="text-lg font-medium">{staffDetails.name}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Email</p>
+                  <p className="text-lg font-medium">{staffDetails.email}</p>
+                </div>
+                <div className="flex gap-2 mt-8">
+                  <button
+                    onClick={handleLogout}
+                    className="px-3 py-1 lg:w-25 text-sm lg:text-lg font-semibold font-[sans] bg-white p-2 
+                        rounded transition ease-in-out duration-400 border-3 bg-gradient-to-r from-blue-900 
+                        via-blue-800 to-blue-900 text-white border-blue-900 cursor:pointer hover:text-gray-300"
+                  >
+                    Logout
+                  </button>
+                  <button
+                    onClick={handleEditToggle}
+                    className={`px-3 py-1 lg:w-25 text-sm lg:text-lg font-semibold font-[sans] bg-white p-2 
+                        rounded transition ease-in-out duration-400 border-3 bg-gradient-to-r from-blue-900 
+                        via-blue-800 to-blue-900 text-white border-blue-900 cursor:pointer hover:text-gray-300${
+                      editMode
+                        ? "bg-gray-400 hover:bg-gray-500"
+                        : "bg-blue-600 hover:bg-blue-700"
+                    }`}
+                  >
+                    Edit
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+
+        {/* Placeholder or Avatar / Profile Card */}
+        <div className="w-full md:w-1/2 flex items-center justify-center">
+          <div className="border border-gray-300 rounded-lg p-6 flex flex-col items-center">
+            <div className="w-24 h-24 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 text-4xl font-semibold">
+              {staffDetails.name?.charAt(0).toUpperCase()}
+            </div>
+            <p className="mt-4 text-gray-700 font-medium">
+              {staffDetails.name}
+            </p>
+            <p className="text-sm text-gray-500">{staffDetails.email}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default StaffProfile;
