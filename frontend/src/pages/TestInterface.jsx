@@ -10,7 +10,7 @@ import Logo from "../components/Logo";
 
 function TestUI() {
   const [showCalculator, setShowCalculator] = useState(false);
-  const [aptitudeQuestions, setAptitudeQuestions] = useState([]);
+  const [aptitudeQuestions, setAptitudeQuestions] = useState([]); 
   const [technicalQuestions, setTechnicalQuestions] = useState([]);
   const [currentSection, setCurrentSection] = useState("Aptitude");
   const [selectedQuestion, setSelectedQuestion] = useState(1);
