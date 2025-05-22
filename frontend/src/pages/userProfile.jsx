@@ -402,30 +402,39 @@ useEffect(() => {
             <h2 className="mb-4 text-center text-xl font-bold font-[Sans]">
               Test Performance
             </h2>
-            <div className="h-75 w-full">
-              {/* Graph */}
-              <Line data={lineGraphData} />
+            <div className="w-full h-[300px] sm:h-[200px] md:h-[400px] lg:h-[300px]">
+            {/* Graph */}
+            <Line data={lineGraphData} />
 
-              {/* Avg Marks Info */}
-              <div className="mt-5 flex flex-col items-center text-base font-bold text-gray-800 bg-blue-100 py-2 rounded">
-                {error ? (
-                  <p className="text-red-500">{error}Failed to fetch avg marks...</p>
-                ) : avgMarksData ? (
-                  <div  className="flex flex-row justify-between gap-20 items-center">
-                    <p>Total Attempted Tests: <span className="text-gray-800 font-bold">{avgMarksData.attemptedTestsCount}</span></p>
-                    <p>Average Marks: <span className="text-gray-800 font-bold">{avgMarksData.avgMarks}</span></p>
-                  </div>
-                ) : (
-                  <p>Loading avg marks...</p>
-                )}
-              </div>
+            {/* Avg Marks Info */}
+            <div className="px-2 md:my-2 mt-5 flex flex-col items-center text-base font-bold text-gray-800 bg-blue-100 py-2 rounded">
+              {error ? (
+                <p className="text-red-500">{error} Failed to fetch avg marks...</p>
+              ) : avgMarksData ? (
+                <div className="flex flex-row justify-between gap-10 md:gap-20 items-center">
+                  <p>
+                    Total Attempted Tests:{" "}
+                    <span className="text-gray-800 font-bold">
+                      {avgMarksData.attemptedTestsCount}
+                    </span>
+                  </p>
+                  <p>
+                    Average Marks:{" "}
+                    <span className="text-gray-800 font-bold">
+                      {avgMarksData.avgMarks}
+                    </span>
+                  </p>
+                </div>
+              ) : (
+                <p>Loading avg marks...</p>
+              )}
             </div>
+          </div>
 
           </div>
 
-          {/* Rank Comparison Section */}
           <div className="w-full lg:w-1/2 bg-white hover:bg-gray-100 shadow-md rounded-lg p-5">
-            <h2 className="mb-4 text-center text-xl font-bold font-[Sans]">
+            <h2 className="mb-6 text-center text-xl font-bold font-[Sans]">
               Your Rank
             </h2>
 
@@ -448,25 +457,34 @@ useEffect(() => {
                 Branch: {rankDetails.currentUser.branch || "N/A"}
               </p> */}
 
-                <div className="w-full bg-gray-200 rounded-full h-4 mt-2">
-                  <div
-                    className="bg-green-500 h-4 rounded-full"
-                    style={{
-                      width: `${
-                        ((rankDetails.rankList.length -
-                          rankDetails.userRank +
-                          1) /
-                          rankDetails.rankList.length) *
-                        100
-                      }%`,
-                    }}
-                  ></div>
+                {/* ...existing code... */}
+                <div className="flex flex-col items-center mt-2">
+                  {/* <div className="text-4xl mb-2 animate-bounce">
+                    {rankDetails.userRank === 1
+                      ? "🏆"
+                      : rankDetails.userRank === 2
+                      ? "🥈"
+                      : rankDetails.userRank === 3
+                      ? "🥉"
+                      : "⭐"}
+                  </div> */}
+                  <div className="text-lg font-semibold text-gray-700">
+                    Rank <span className="text-blue-700">{rankDetails.userRank}</span> / <span className="text-blue-700">{rankDetails.rankList.length}</span>
+                  </div>
+                  <div className="mt-1 text-center text-base font-medium text-gray-600">
+                    {rankDetails.userRank === 1
+                      ? "🏆 You're the top performer! Keep it up!"
+                      : rankDetails.userRank <= 3
+                      ? "🎉 Great job! You're in the top 3!"
+                      : "Keep going! Aim for the top!"}
+                  </div>
                 </div>
+                {/* ...existing code... */}
 
                 {/* Toggle Button for Rank List */}
                 <button
                   onClick={() => setShowRankList(!showRankList)}
-                  className="mt-4 px-3 py-1 lg:w-45 text-sm lg:text-lg font-semibold font-[sans] bg-white p-2 
+                  className="mt-6 px-3 py-1 lg:w-45 text-sm lg:text-lg font-semibold font-[sans] bg-white p-2 
                         rounded transition ease-in-out duration-400 border-3 bg-gradient-to-r from-blue-900 
                         via-blue-800 to-blue-900 text-white border-blue-900 cursor:pointer hover:text-gray-300"
                 >
@@ -532,7 +550,7 @@ useEffect(() => {
                     <td className="border-b p-2">
                       <button
                         onClick={() => navigate(`/test-details/${test.testId}`)}
-                        className="px-3 py-1 lg:w-45 text-sm lg:text-lg font-semibold font-[sans] bg-white p-2 
+                        className="px-3 py-1 lg:w-35 text-sm lg:text-lg font-semibold font-[sans] bg-white p-2 
                         rounded transition ease-in-out duration-400 border-3 bg-gradient-to-r from-blue-900 
                         via-blue-800 to-blue-900 text-white border-blue-900 cursor:pointer hover:text-gray-300"
                       >

@@ -17,7 +17,7 @@ function TestUI() {
   const [questionStatus, setQuestionStatus] = useState([]);
   const [user, setUser] = useState({ name: "", branch: "" });
   const [error, setError] = useState(null);
-  const [currentTime, setCurrentTime] = useState(new Date());
+  // const [currentTime, setCurrentTime] = useState(new Date());
   // const [selectedAnswer, setSelectedAnswer] = useState(null); // This state is no longer needed
   const [isSubmitting, setIsSubmitting] = useState(false);
   const currentQuestions = currentSection === "Aptitude" ? aptitudeQuestions : technicalQuestions;
@@ -117,17 +117,115 @@ function clearResponse() {
   setChosenAnswers(updatedAnswers);
   localStorage.setItem("testResponses", JSON.stringify(updatedAnswers));
 }
+// Modified saveAndNext to save the current state to localStorage
+function saveAndNext() {
+  // Save the current state of chosenAnswers to localStorage
+  localStorage.setItem("testResponses", JSON.stringify(chosenAnswers));
+  console.log("Updated chosenAnswers in localStorage:", chosenAnswers);
 
+  // Update questionStatus to "answered" or "notAnswered" for the current question
+  setQuestionStatus((prevStatus) => {
+    const updatedStatus = [...prevStatus];
+    const index = selectedQuestion - 1;
+    const currentQuestion = currentQuestions[index];
+    const answerEntry = chosenAnswers.find(ans => ans.questionId === currentQuestion?._id);
+    const hasAnswer = answerEntry && answerEntry.chosenAnswer && answerEntry.chosenAnswer.length > 0;
+    updatedStatus[index] = hasAnswer ? "answered" : "notAnswered";
+    return updatedStatus;
+  });
 
-  // Modified saveAndNext to save the current state to localStorage
-  function saveAndNext() {
-    // Save the current state of chosenAnswers to localStorage
-    localStorage.setItem("testReponses", JSON.stringify(chosenAnswers));
-    console.log("Updated chosenAnswers in localStorage:", chosenAnswers);
+  goToNextQuestion();
+}
 
-    goToNextQuestion();
+// Mark for review function
+function markForReview() {
+  const currentQuestion = currentQuestions[selectedQuestion - 1];
+  const questionId = currentQuestion._id;
+
+  setChosenAnswers((prevAnswers) => {
+    const existingAnswerIndex = prevAnswers.findIndex(
+      (ans) => ans.questionId === questionId
+    );
+
+    if (existingAnswerIndex !== -1) {
+      // Update existing answer entry
+      const updatedAnswers = [...prevAnswers];
+      updatedAnswers[existingAnswerIndex].attemptedStatus = true; // Mark as attempted
+      return updatedAnswers;
+    } else {
+      // Add new answer entry
+      return [
+        ...prevAnswers,
+        {
+          questionId: questionId,
+          chosenAnswer: [],
+          attemptedStatus: true, // Mark as attempted
+        },
+      ];
+    }
+  });
+
+  // Update questionStatus to "marked" or "answeredMarked" for the current question
+  setQuestionStatus((prevStatus) => {
+    const updatedStatus = [...prevStatus];
+    const index = selectedQuestion - 1;
+    // Check if the question has an answer
+    const answerEntry = chosenAnswers.find(ans => ans.questionId === questionId);
+    const hasAnswer = answerEntry && answerEntry.chosenAnswer && answerEntry.chosenAnswer.length > 0;
+    updatedStatus[index] = hasAnswer ? "answeredMarked" : "marked";
+    return updatedStatus;
+  });
+
+  goToNextQuestion();
+}
+
+// --- FIX: Maintain question status across section switches ---
+
+// Helper to get status for all questions in a section based on chosenAnswers
+function getSectionQuestionStatus(sectionQuestions) {
+  return sectionQuestions.map((question) => {
+    const answerEntry = chosenAnswers.find(ans => ans.questionId === question._id);
+    if (!answerEntry) return "notVisited";
+    if (
+      answerEntry.attemptedStatus &&
+      answerEntry.chosenAnswer &&
+      answerEntry.chosenAnswer.length > 0
+    ) {
+      // Check for marked for review
+      if (
+        questionStatus.length &&
+        (questionStatus.find((_, idx) => sectionQuestions[idx]._id === question._id) === "answeredMarked")
+      ) {
+        return "answeredMarked";
+      }
+      return "answered";
+    }
+    if (
+      answerEntry.attemptedStatus &&
+      (!answerEntry.chosenAnswer || answerEntry.chosenAnswer.length === 0)
+    ) {
+      // Check for marked for review
+      if (
+        questionStatus.length &&
+        (questionStatus.find((_, idx) => sectionQuestions[idx]._id === question._id) === "marked")
+      ) {
+        return "marked";
+      }
+      return "notAnswered";
+    }
+    return "notVisited";
+  });
+}
+
+// Update questionStatus when section or chosenAnswers changes
+useEffect(() => {
+  if (currentSection === "Aptitude") {
+    setQuestionStatus(getSectionQuestionStatus(aptitudeQuestions));
+  } else {
+    setQuestionStatus(getSectionQuestionStatus(technicalQuestions));
   }
-
+  // eslint-disable-next-line
+}, [currentSection, chosenAnswers, aptitudeQuestions, technicalQuestions]);
 
   // Submit Test Button Handler - uses chosenAnswers state
   //only saves the test to the database
@@ -434,29 +532,108 @@ async function submitTest(branchId, createdBy) {
 
     fetchUserData();
   }, []);
+  // Timer logic for 3 hours (in seconds)
+  const TEST_DURATION = 3 * 60 * 60;
+
+  // Always reset timer on refresh or navigation away
+  useEffect(() => {
+    // Set new end time on mount (refresh)
+    const newEndTime = Date.now() + TEST_DURATION * 1000;
+    localStorage.setItem("testEndTime", newEndTime);
+    setRemainingTime(TEST_DURATION);
+
+    // Optional: Reset timer if user is about to leave (no alert)
+    const handleBeforeUnload = () => {
+      const resetEndTime = Date.now() + TEST_DURATION * 1000;
+      localStorage.setItem("testEndTime", resetEndTime);
+    };
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+    // eslint-disable-next-line
+  }, []);
+
+  const [remainingTime, setRemainingTime] = useState(TEST_DURATION);
 
   useEffect(() => {
+    if (remainingTime <= 0) {
+      // Auto-submit test if time is up
+      if (!isSubmitting && !showEvalutionModal) {
+        setIsSubmitting(true);
+        setShowTestSummary(false);
+        submitTest(user.branch, user._id);
+      }
+      return;
+    }
     const timer = setInterval(() => {
-      setCurrentTime(new Date());
+      const savedEndTime = localStorage.getItem("testEndTime");
+      const endTime = savedEndTime ? parseInt(savedEndTime, 10) : Date.now() + TEST_DURATION * 1000;
+      const now = Date.now();
+      const newRemaining = Math.max(0, Math.floor((endTime - now) / 1000));
+      setRemainingTime(newRemaining);
+      if (newRemaining <= 0) {
+        clearInterval(timer);
+      }
     }, 1000);
 
-    return () => clearInterval(timer);
-  }, []);
+    return () => {
+      clearInterval(timer);
+    };
+    // eslint-disable-next-line
+  }, [remainingTime, isSubmitting, showEvalutionModal, user.branch, user._id]);
+
+  // Clean up endTime on unmount or test submit
+  useEffect(() => {
+    if (showEvalutionModal) {
+      localStorage.removeItem("testEndTime");
+    }
+  }, [showEvalutionModal]);
+
+  // Format remaining time as HH:MM:SS
+  function formatTime(seconds) {
+    const h = String(Math.floor(seconds / 3600)).padStart(2, "0");
+    const m = String(Math.floor((seconds % 3600) / 60)).padStart(2, "0");
+    const s = String(seconds % 60).padStart(2, "0");
+    return `${h}:${m}:${s}`;
+  }
+
+  TestUI.formatTime = formatTime;
+  TestUI.remainingTime = remainingTime;
 
   const handleCalculatorClick = () => {
     setShowCalculator(!showCalculator);
   };
 
+  // Handles clicking a question number and updates its status dynamically
   const handleQuestionClick = (number) => {
     setSelectedQuestion(number);
 
-    // Update status for the clicked question
-    setQuestionStatus(prevStatus => {
+    setQuestionStatus((prevStatus) => {
       const updatedStatus = [...prevStatus];
       const index = number - 1;
+      const currentQuestion = currentQuestions[index];
+
+      // Find chosen answer for this question
+      const answerEntry = chosenAnswers.find(ans => ans.questionId === currentQuestion?._id);
+      const hasAnswer = answerEntry && answerEntry.chosenAnswer && answerEntry.chosenAnswer.length > 0;
+
+      // If already marked for review, keep marked/answeredMarked
+      if (updatedStatus[index] === "marked" || updatedStatus[index] === "answeredMarked") {
+        return updatedStatus;
+      }
+
+      // If not visited, update to answered/notAnswered based on answer
       if (updatedStatus[index] === "notVisited") {
+        updatedStatus[index] = hasAnswer ? "answered" : "notAnswered";
+      } else if (updatedStatus[index] === "notAnswered" && hasAnswer) {
+        updatedStatus[index] = "answered";
+      } else if (updatedStatus[index] === "answered" && !hasAnswer) {
         updatedStatus[index] = "notAnswered";
       }
+      // else keep as is (for marked, answeredMarked, etc.)
+
       return updatedStatus;
     });
   };
@@ -506,7 +683,9 @@ async function submitTest(branchId, createdBy) {
         >
           {showCalculator ? "Hide Calculator" : "Show Calculator"}
         </button>
-        <p className="text-lg font-semibold">Timer: {currentTime.toLocaleTimeString()}</p>
+        <p className="text-lg font-semibold text-red-600">
+        Time Left: {formatTime(remainingTime)}
+      </p>
       </div>
 
       {/* Main Container */}
@@ -536,21 +715,30 @@ async function submitTest(branchId, createdBy) {
               Marks: {currentQuestions[selectedQuestion - 1]?.mark}
               {currentQuestions[selectedQuestion - 1]?.negativeMark && (
                 <span className="text-red-600 ml-2">
-                  (Negative Mark: {currentQuestions[selectedQuestion - 1]?.mark}/3)
+                  (Negative Mark: {currentQuestions[selectedQuestion - 1]?.mark}
+                  /3)
                 </span>
               )}
             </p>
             <div className="flex flex-col items-start mt-4">
-                {currentQuestions[selectedQuestion - 1]?.queType === "MCQ" &&
-                  currentQuestions[selectedQuestion - 1]?.options?.map((option, index) => (
+              {currentQuestions[selectedQuestion - 1]?.queType === "MCQ" &&
+                currentQuestions[selectedQuestion - 1]?.options?.map(
+                  (option, index) => (
                     <div key={index} className="flex items-center mb-2">
                       <input
                         type="radio"
                         name={`question-${selectedQuestion}`}
                         value={option}
                         id={`option-${selectedQuestion}-${index}`}
-                        checked={getChosenAnswerForCurrentQuestion()?.[0] === option} // Ensure chosenAnswer is an array
-                        onChange={() => handleAnswerSelect(currentQuestions[selectedQuestion - 1], option)} // Pass question object and selected option
+                        checked={
+                          getChosenAnswerForCurrentQuestion()?.[0] === option
+                        } // Ensure chosenAnswer is an array
+                        onChange={() =>
+                          handleAnswerSelect(
+                            currentQuestions[selectedQuestion - 1],
+                            option
+                          )
+                        } // Pass question object and selected option
                         className="form-radio h-5 w-5 text-blue-600 transition duration-150 ease-in-out"
                       />
                       <label
@@ -560,25 +748,39 @@ async function submitTest(branchId, createdBy) {
                         {option}
                       </label>
                     </div>
-                  ))}
+                  )
+                )}
 
               {currentQuestions[selectedQuestion - 1]?.queType === "MSQ" &&
-                currentQuestions[selectedQuestion - 1]?.options?.map((option, index) => (
-                  <div key={index} className="flex items-center mb-2">
-                    <input
-                      type="checkbox"
-                      name={`question-${selectedQuestion}`}
-                      value={option}
-                      id={`option-${index}`}
-                      checked={Array.isArray(getChosenAnswerForCurrentQuestion()) && getChosenAnswerForCurrentQuestion().includes(option)} // Check if this option is in the selected options array
-                      onChange={() => handleAnswerSelect(currentQuestions[selectedQuestion - 1], option)} // Pass question object and selected option
-                       className="form-checkbox h-5 w-5 text-blue-600 transition duration-150 ease-in-out"
-                    />
-                    <label htmlFor={`option-${index}`}         className="ml-2 text-gray-700 cursor-pointer">
-                      {option}
-                    </label>
-                  </div>
-                ))}
+                currentQuestions[selectedQuestion - 1]?.options?.map(
+                  (option, index) => (
+                    <div key={index} className="flex items-center mb-2">
+                      <input
+                        type="checkbox"
+                        name={`question-${selectedQuestion}`}
+                        value={option}
+                        id={`option-${index}`}
+                        checked={
+                          Array.isArray(getChosenAnswerForCurrentQuestion()) &&
+                          getChosenAnswerForCurrentQuestion().includes(option)
+                        } // Check if this option is in the selected options array
+                        onChange={() =>
+                          handleAnswerSelect(
+                            currentQuestions[selectedQuestion - 1],
+                            option
+                          )
+                        } // Pass question object and selected option
+                        className="form-checkbox h-5 w-5 text-blue-600 transition duration-150 ease-in-out"
+                      />
+                      <label
+                        htmlFor={`option-${index}`}
+                        className="ml-2 text-gray-700 cursor-pointer"
+                      >
+                        {option}
+                      </label>
+                    </div>
+                  )
+                )}
 
               {currentQuestions[selectedQuestion - 1]?.queType === "NAT" && (
                 <div className="flex items-center mb-2">
@@ -590,8 +792,13 @@ async function submitTest(branchId, createdBy) {
                     name={`question-${selectedQuestion}`}
                     id={`nat-${selectedQuestion}`}
                     className="border border-gray-300 rounded-md px-2 py-1"
-                    value={getChosenAnswerForCurrentQuestion() || ''} // Set the value from state
-                    onChange={(e) => handleAnswerSelect(currentQuestions[selectedQuestion - 1], e.target.value)} // Pass question object and input value
+                    value={getChosenAnswerForCurrentQuestion() || ""} // Set the value from state
+                    onChange={(e) =>
+                      handleAnswerSelect(
+                        currentQuestions[selectedQuestion - 1],
+                        e.target.value
+                      )
+                    } // Pass question object and input value
                   />
                 </div>
               )}
@@ -599,18 +806,30 @@ async function submitTest(branchId, createdBy) {
           </div>
 
           <div className="flex justify-between items-center mt-6">
-            <button 
-            onClick={clearResponse}
-            className="mx-2 h-12 w-30 lg:h-10 lg:w-38 
+            <button
+              onClick={clearResponse}
+              className="mx-2 h-12 w-30 lg:h-10 lg:w-38 
              flex items-center justify-center
              text-sm font-semibold text-gray-800 
              border-2 border-blue-900 rounded 
              hover:bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900 
-             hover:text-white transition duration-300 ease-in-out">
+             hover:text-white transition duration-300 ease-in-out"
+            >
               Clear Response
             </button>
             <button
-              onClick={() => saveAndNext()} 
+              onClick={() => markForReview()}
+              className="mx-2 h-12 w-30 lg:h-10 lg:w-38 
+             flex items-center justify-center
+             text-sm font-semibold text-gray-800 
+             border-2 border-blue-900 rounded 
+             hover:bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900 
+             hover:text-white transition duration-300 ease-in-out"
+            >
+              Mark for Review
+            </button>
+            <button
+              onClick={() => saveAndNext()}
               className="mx-2 h-12 w-30 lg:h-10 lg:w-38 
              flex items-center justify-center
              text-sm font-semibold text-gray-800 
@@ -626,7 +845,7 @@ async function submitTest(branchId, createdBy) {
                   // console.log("Branch ID:", user.branchId);
                   // console.log("Created By:", user._id);
                   setIsSubmitting(true); // Disable the button
-                  setShowTestSummary(true)// Pass user._id as createdBy
+                  setShowTestSummary(true); // Pass user._id as createdBy
                 }
               }}
               disabled={isSubmitting} // Disable the button after the first click
@@ -636,18 +855,19 @@ async function submitTest(branchId, createdBy) {
              border-2 border-blue-900 rounded 
              hover:bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900 
              hover:text-white transition duration-300 ease-in-out ${
-                              isSubmitting ? 'opacity-50 cursor-not-allowed' : ''
-                          }`}
-          >
+               isSubmitting ? "opacity-50 cursor-not-allowed" : ""
+             }`}
+            >
               Submit Test
-          </button>
-
+            </button>
           </div>
         </div>
 
         {/* Right Section */}
         <div className="w-full lg:w-1/4 p-6 bg-gray-100 border-l-2 border-gray-300 overflow-x-auto">
-          <h2 className="text-xl font-semibold mb-4">Chosen Section: {currentSection}</h2>
+          <h2 className="text-xl font-semibold mb-4">
+            Chosen Section: {currentSection}
+          </h2>
           <p className="text-sm mb-4 text-gray-600">Choose a Question</p>
           <div className="grid grid-cols-4 gap-2 md:gap-6 md:pr-2">
             {currentQuestions.map((_, index) => (
@@ -662,22 +882,25 @@ async function submitTest(branchId, createdBy) {
         </div>
       </div>
 
-
-        {showTestSummary && (
-          <TestSummary
-            onConfirm={() => {
-              setShowTestSummary(false);
-              submitTest(user.branchId, user._id);
-            }}
-            onCancel={() => {setShowTestSummary(false)
+      {showTestSummary && (
+        <TestSummary
+          onConfirm={() => {
+            setShowTestSummary(false);
+            submitTest(user.branch, user._id);
+          }}
+          onCancel={() => {
+            setShowTestSummary(false);
             setIsSubmitting(false); // Re-enable the button
-            }}
-            totalQuestions={aptitudeQuestions.length + technicalQuestions.length}
-            attemptedQuestions={chosenAnswers.filter((ans) => ans.attemptedStatus).length}
-            />
-          )}
-      
-        {showEvalutionModal && <TestEvaluationModal
+          }}
+          totalQuestions={aptitudeQuestions.length + technicalQuestions.length}
+          attemptedQuestions={
+            chosenAnswers.filter((ans) => ans.attemptedStatus).length
+          }
+        />
+      )}
+
+      {showEvalutionModal && (
+        <TestEvaluationModal
           progressMessage={progressMessage}
           result={result} // Replace with actual result state if available
           onClose={() => {
@@ -685,10 +908,10 @@ async function submitTest(branchId, createdBy) {
             setShowEvalutionModal(false);
             setIsSubmitting(false);
             navigate("/userProfile"); // Redirect to home or desired route
-          }}/>
-        }
-     
-     
+          }}
+        />
+      )}
+
       {/* Scientific Calculator */}
       {showCalculator && (
         <div className="fixed bottom-4 right-4 bg-white shadow-lg rounded-lg p-4">
