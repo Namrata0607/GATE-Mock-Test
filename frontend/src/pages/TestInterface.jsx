@@ -15,7 +15,7 @@ function TestUI() {
   const [currentSection, setCurrentSection] = useState("Aptitude");
   const [selectedQuestion, setSelectedQuestion] = useState(1);
   const [questionStatus, setQuestionStatus] = useState([]);
-  const [user, setUser] = useState({ name: "", branch: "" });
+  const [user, setUser] = useState({ name: "", branchId: "", branchName: "", _id: "" });  
   const [error, setError] = useState(null);
   // const [currentTime, setCurrentTime] = useState(new Date());
   // const [selectedAnswer, setSelectedAnswer] = useState(null); // This state is no longer needed
@@ -231,6 +231,7 @@ useEffect(() => {
   //only saves the test to the database
   // and then calls submitUserTest to submit the test
 async function submitTest(branchId, createdBy) {
+  console.log("Submited test with branchId:", branchId);
   const token = localStorage.getItem("userToken");
   if (!token) {
     alert("No token found. Please log in again.");
@@ -306,6 +307,7 @@ async function submitTest(branchId, createdBy) {
   };
 
   try {
+    console.log("Pauload:",payload)
     const response = await fetch("http://localhost:3000/api/test/uploadTest/", {
       method: "POST",
       headers: {
@@ -515,14 +517,27 @@ async function submitTest(branchId, createdBy) {
             Authorization: `Bearer ${token}`,
           },
         });
-
+        console.log("User Details:", data.branchId);
         // Set user details in state
-        setUser({
-          name: data.name,
-          branchId: data.branchId, // Store branch ID
-          branchName: data.branchName, // Store branch name
-          _id: data._id, // Store user ID
-        });
+        if (data && data.name && data.branchId && data.branchName && data._id) {
+            setUser({
+            name: data.name,
+            branchId: data.branchId, // Store branch ID
+            branchName: data.branchName, // Store branch name
+            _id: data._id, // Store user ID
+            });
+            setTimeout(() => {
+            console.log("User data set successfully:", {
+              name: data.name,
+              branchId: data.branchId,
+              branchName: data.branchName,
+              _id: data._id,
+            });
+            }, 0);
+        } else {
+          console.error("User data is incomplete or missing:", data);
+          setError("Failed to load user details. Please try again.");
+        }
       } catch (err) {
         console.error("Error fetching user details:", err.message);
         setError(err.message);
@@ -530,6 +545,7 @@ async function submitTest(branchId, createdBy) {
     };
 
     fetchUserData();
+    
   }, []);
   // Timer logic for 3 hours (in seconds)
   const TEST_DURATION = 3 * 60 * 60;
@@ -557,12 +573,13 @@ async function submitTest(branchId, createdBy) {
   const [remainingTime, setRemainingTime] = useState(TEST_DURATION);
 
   useEffect(() => {
+    console.log("Branch", user.branchId);
     if (remainingTime <= 0) {
       // Auto-submit test if time is up
       if (!isSubmitting && !showEvalutionModal) {
         setIsSubmitting(true);
         setShowTestSummary(false);
-        submitTest(user.branch, user._id);
+        submitTest(user.branchId, user._id);
       }
       return;
     }
@@ -581,7 +598,7 @@ async function submitTest(branchId, createdBy) {
       clearInterval(timer);
     };
     // eslint-disable-next-line
-  }, [remainingTime, isSubmitting, showEvalutionModal, user.branch, user._id]);
+  }, [remainingTime, isSubmitting, showEvalutionModal, user.branchId, user._id]);
 
   // Clean up endTime on unmount or test submit
   useEffect(() => {
@@ -885,7 +902,7 @@ async function submitTest(branchId, createdBy) {
         <TestSummary
           onConfirm={() => {
             setShowTestSummary(false);
-            submitTest(user.branch, user._id);
+            submitTest(user.branchId, user._id);
           }}
           onCancel={() => {
             setShowTestSummary(false);
@@ -978,7 +995,7 @@ const TestEvaluationModal = ({ progressMessage, result, onClose }) => {
   return (
     <div className="fixed inset-0 bg-black/40 bg-opacity-60 flex justify-center items-center z-50">
       <div className="bg-white rounded-lg shadow-2xl w-screen h-screen p-8">
-        <h2 className="text-3xl font-extrabold text-blue-700 mb-6 text-center">
+        <h2 className="text-3xl font-extrabold text-blue-900 mb-6 text-center">
           Test Evaluation
         </h2>
         {result ? (
@@ -1024,7 +1041,7 @@ const TestEvaluationModal = ({ progressMessage, result, onClose }) => {
             <div className="flex justify-center mt-6">
               <button
                 onClick={onClose}
-                className="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition duration-300"
+                className="px-6 py-3 bg-blue-900 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition duration-300"
               >
                 View Detailed Results
               </button>

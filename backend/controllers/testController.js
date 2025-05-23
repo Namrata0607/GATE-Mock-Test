@@ -135,7 +135,7 @@ const shuffleArray = (array) => {
 const uploadTests = async (req, res, next) => {
     try {
       const { branchId, subjectsData, createdBy, testResponses } = req.body;
-  
+      console.log("Received Branch ID:", req.body);
       // console.log("Received Subjects Data:", subjectsData);
   
       if (!Array.isArray(subjectsData) || subjectsData.length === 0) {
@@ -152,7 +152,7 @@ const uploadTests = async (req, res, next) => {
       // Proceed with saving the test
       const testCount = await Tests.countDocuments();
       const newTestName = `Test${testCount + 1}`;
-  
+      
       const newTest = new Tests({
         testName: newTestName,
         branch: branchId,

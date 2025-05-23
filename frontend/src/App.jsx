@@ -59,7 +59,7 @@ function AppContent() {
         <Route path="/examguide" element={<ExamGuide />} />
         <Route path="/uloginsignup" element={<ULoginSignup />} />
         <Route path="/userDashboard" element={<Instructions />} />
-        <Route path="/prequestionp" element={<PreQuestionP />} />
+        {/* <Route path="/prequestionp" element={<PreQuestionP />} /> */}
         <Route path="/testui" element={<TestUI />} />
         <Route path="/staffLogin" element={<StaffLogin />} />
         <Route path="/staffDashboard" element={<StaffDashboard />} />

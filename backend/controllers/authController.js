@@ -2,26 +2,46 @@ const User = require('../models/user');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
-
 const register = async (req, res, next) => {
-    try{
-        const { name, email, password ,confirmPassword, branch, mobile } = req.body;
+    try {
+        const { name, email, password, confirmPassword, branch, mobile } = req.body;
 
-        if(password !== confirmPassword){
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            return res.status(400).json({
+                message: "Invalid email format"
+            });
+        }
+
+        const passwordRegex = /^(?=.*[0-9])(?=.*[!@#$%^&*])[A-Za-z0-9!@#$%^&*]{6,}$/;
+        if (!passwordRegex.test(password)) {
+            return res.status(400).json({
+                message: "Password must be at least 6 characters long and contain at least one number and one special character"
+            });
+        }
+
+        if (password !== confirmPassword) {
             return res.status(400).json({
                 message: "Passwords do not match"
             });
         }
 
-        let user = await User.findOne({ email });
-//findOne() is a mongoose method that returns the first document that matches the query
+        const mobileRegex = /^[0-9]{10}$/;
+        if (!mobileRegex.test(mobile)) {
+            return res.status(400).json({
+                message: "Mobile number must be exactly 10 digits"
+            });
+        }
 
-        if(user){
+        // Check if user already exists
+        let user = await User.findOne({ email });
+        if (user) {
             return res.status(400).json({ 
                 message: "User already exists" 
             });
-        };
-        
+        }
+
+        // Create and save the new user
         user = new User({ 
             name, 
             email, 
@@ -31,6 +51,7 @@ const register = async (req, res, next) => {
             mobile,
             attemptedTests: [],
         });
+
         await user.save();
 
         res.status(201).json({
@@ -41,10 +62,11 @@ const register = async (req, res, next) => {
                 branch: user.branch,
             }
         });
-    }catch(error){
+    } catch (error) {
         next(error);
     }
 };
+
 
 const login = async (req, res ,next) => {
     try{

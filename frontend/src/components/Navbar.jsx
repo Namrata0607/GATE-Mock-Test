@@ -38,13 +38,13 @@ function Navbar() {
             >
               Exam Guide
             </Link>
-            <Link
+            {/* <Link
               to="/prequestionp"
               className="block px-4 py-2 hover:bg-gray-200"
               onClick={() => setMenuOpen(false)}
             >
               Previous Question Papers
-            </Link>
+            </Link> */}
           </div>
         )}
       </div>
@@ -66,14 +66,14 @@ function Navbar() {
         >
           Exam Guide
         </Link>
-        <Link
+        {/* <Link
           to="/prequestionp"
           className={`${linkClass} ${
             location.pathname === "/prequestionp" ? activeClass : inactiveClass
           }`}
         >
           Previous Question Papers
-        </Link>
+        </Link> */}
       </div>
     </nav>
   );
